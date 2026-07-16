@@ -1891,15 +1891,27 @@
 
     // 4. AUTOMATED PREMIUM VERIFICATION SYSTEM
     async function checkPremiumStatus(user) {
+      console.log("Checking premium status for user ID:", user.id);
+
       const { data, error } = await supabaseClient
-        .from('profiles')
-        .select('is_premium')
+        .from('profiles') // <-- If your table name is different (like 'Rigs'), change this!
+        .select('*')      // <-- Selects all columns so we can inspect the whole row
         .eq('id', user.id)
         .single();
 
+      if (error) {
+        console.error("Supabase Database Error:", error.message);
+        console.error("Error Code:", error.code);
+        return false;
+      }
+
+      console.log("Database response data:", data);
+
       const upgradeBtn = document.getElementById('btn-upgrade');
 
-      if (data && data.is_premium) {
+      // Check if data exists AND if the premium column is true
+      // Note: If you named your column 'has_premium' instead of 'is_premium', change it here:
+      if (data && (data.is_premium === true || data.has_premium === true)) {
         if (upgradeBtn) {
           upgradeBtn.textContent = "Premium Active ✨";
           upgradeBtn.style.opacity = "0.6";
@@ -1907,6 +1919,8 @@
         }
         return true;
       }
+
+      console.log("User found, but premium status is false/not matching code fields.");
       return false;
     }
 
