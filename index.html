@@ -1892,7 +1892,7 @@
     // 4. AUTOMATED PREMIUM VERIFICATION SYSTEM
     async function checkPremiumStatus(user) {
       const { data, error } = await supabaseClient
-        .from('profiles')
+        .from('Rigs')
         .select('is_premium')
         .eq('id', user.id)
         .single();
@@ -1950,7 +1950,7 @@
       await Dialog.alert('Your account has been disconnected.', { kicker: 'ACCOUNT', title: 'Signed out' });
     });
 
-    // 7. PAYWALL CHECK TRIGGER LINK
+    //PAYWALL CHECK TRIGGER LINK
     document.getElementById('btn-save-cloud').addEventListener('click', async () => {
       const { data: { user } } = await supabaseClient.auth.getUser();
       if (!user) return;
