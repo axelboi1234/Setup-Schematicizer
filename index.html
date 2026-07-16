@@ -1140,10 +1140,10 @@
       { cat: 'effect', label: 'Boss DS-1 Distortion', inPorts: [['In', 'audio']], outPorts: [['Out', 'audio']] },
       { cat: 'effect', label: 'Boss BD-2 Blues Driver', inPorts: [['In', 'audio']], outPorts: [['Out', 'audio']] },
       { cat: 'effect', label: 'Boss DD-8 Digital Delay', inPorts: [['L', 'audio'], ['R', 'audio'], ['TEMPO/EXP', 'control']], outPorts: [['L', 'audio'], ['R', 'audio']] },
-      { cat: 'effect', label: 'Boss RV-6 Reverb', inPorts: [['L', 'audio'], ['R',]['EXP', 'control']], outPorts: [['L', 'audio'], ['R', 'audio']] },
-      { cat: 'effect', label: 'Boss CE-2W Chorus', inPorts: [['', 'audio']], outPorts: [['L', 'audio'], ['R', 'audio']] },
+      { cat: 'effect', label: 'Boss RV-6 Reverb', inPorts: [['L', 'audio'], ['R', 'audio']['EXP', 'control']], outPorts: [['L', 'audio'], ['R', 'audio']] },
+      { cat: 'effect', label: 'Boss CE-2W Chorus', inPorts: [['L', 'audio'], ['R', 'audio']], outPorts: [['L', 'audio'], ['R', 'audio']] },
       { cat: 'effect', label: 'Boss GT-1000 multi-FX', inPorts: [['', 'audio'], ['CTL/EXP', 'control'], ['MIDI', 'midi']], outPorts: [['Main L', 'audio'], ['Main R', 'audio'], ['MIDI', 'midi']] },
-      { cat: 'effect', label: 'Behringer TU300 tuner', inPorts: [['', 'audio']], outPorts: [['', 'audio']] },
+      { cat: 'effect', label: 'Behringer TU300 tuner', inPorts: [['In', 'audio']], outPorts: [['Out', 'audio']] },
 
       { cat: 'looper', label: 'Boss RC-5 Loop Station', inPorts: [['L', 'audio'], ['R', 'audio'], ['CTL/EXP', 'control'], ['MIDI', 'midi']], outPorts: [['L', 'audio'], ['R', 'audio'], ['MIDI', 'midi']] },
       { cat: 'looper', label: 'Boss RC-500 Loop Station', inPorts: [['Inst A', 'audio'], ['Inst B', 'audio'], ['Mic', 'audio'], ['CTL/EXP', 'control'], ['MIDI', 'midi']], outPorts: [['L', 'audio'], ['R', 'audio'], ['MIDI', 'midi']] },
@@ -1892,7 +1892,7 @@
     // 4. AUTOMATED PREMIUM VERIFICATION SYSTEM
     async function checkPremiumStatus(user) {
       const { data, error } = await supabaseClient
-        .from('Rigs')
+        .from('profiles')
         .select('is_premium')
         .eq('id', user.id)
         .single();
