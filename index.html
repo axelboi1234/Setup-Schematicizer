@@ -42,6 +42,7 @@
     }
 
     body {
+      padding: 0;
       margin: 0;
       background: var(--bg);
       color: var(--text);
@@ -65,12 +66,15 @@
     .topbar {
       display: flex;
       align-items: center;
-      gap: 12px;
-      padding: 11px 16px;
+      justify-content: space-between;
+      gap: 24px;
+      width: 100%;
+      padding: 10px 20px;
+      box-sizing: border-box;
       background: var(--panel);
       border-bottom: 1px solid var(--border);
       flex-wrap: wrap;
-      flex: none;
+      row-gap: 10px;
       z-index: 10;
     }
 
@@ -84,10 +88,110 @@
       margin: 0;
     }
 
+    .tb-left {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      min-width: 0;
+    }
+
+    .tb-brand {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      white-space: nowrap;
+    }
+
+    .tb-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      row-gap: 8px;
+      justify-content: flex-end;
+    }
+
+    .tb-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .tb-divider {
+      width: 1px;
+      height: 20px;
+      background: var(--border);
+      flex: none;
+    }
+
+    .tb-status {
+      font-size: 12px;
+      color: var(--text-faint);
+      font-family: 'JetBrains Mono', monospace;
+      white-space: nowrap;
+    }
+
     .tagline {
       font-size: 11px;
       color: var(--text-faint);
-      margin-right: 6px;
+    }
+
+    /* Unified topbar button — one consistent style/size for every action in the bar */
+    .tb-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--panel2);
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      font-weight: 500;
+      padding: 7px 13px;
+      border-radius: 5px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: border-color .15s ease, color .15s ease, background .15s ease, opacity .15s ease;
+    }
+
+    .tb-btn:hover {
+      color: var(--text);
+      border-color: var(--text-faint);
+    }
+
+    .tb-btn--primary {
+      background: var(--text);
+      color: var(--panel);
+      border-color: var(--text);
+    }
+
+    .tb-btn--primary:hover {
+      opacity: .9;
+    }
+
+    .tb-btn--danger:hover {
+      border-color: var(--danger);
+      color: var(--danger);
+    }
+
+    .tb-btn--premium {
+      background: var(--instrument);
+      border-color: var(--instrument);
+      color: #241a08;
+      font-weight: 600;
+    }
+
+    .tb-btn--premium:hover {
+      filter: brightness(1.08);
+    }
+
+    .tb-btn--cloud svg {
+      color: var(--daw);
+    }
+
+    .tb-btn--cloud:hover {
+      border-color: var(--daw);
+      color: var(--text);
     }
 
     .name-input {
@@ -132,7 +236,7 @@
     }
 
     .spacer {
-      flex: 1;
+      flex-grow: 1;
     }
 
     .status {
@@ -143,18 +247,23 @@
       text-align: right;
     }
 
-    /*Zoom controls*/
-    .zoom-controls {
+    /*Zoom controls — floating pill pinned to the canvas corner, not the topbar*/
+    .canvas-zoom {
+      position: absolute;
+      right: 16px;
+      bottom: 16px;
       display: flex;
       align-items: center;
-      gap: 4px;
+      gap: 2px;
       background: var(--panel2);
       border: 1px solid var(--border);
-      border-radius: 4px;
-      padding: 2px;
+      border-radius: 6px;
+      padding: 4px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, .35);
+      z-index: 4;
     }
 
-    .zoom-controls button {
+    .canvas-zoom button {
       background: transparent;
       border: none;
       color: var(--text);
@@ -162,11 +271,11 @@
       padding: 4px 8px;
       font-size: 12px;
       font-weight: 600;
+      border-radius: 4px;
     }
 
-    .zoom-controls button:hover {
+    .canvas-zoom button:hover {
       background: var(--panel3);
-      border-radius: 2px;
     }
 
     .zoom-level {
@@ -767,50 +876,6 @@
       gap: 5px;
     }
 
-    /*Nav buttons?*/
-    .nav-btn {
-      background: var(--panel2);
-      border: 1.6px solid var(--border);
-      color: var(--text-dim);
-      padding: 6px 14px;
-      border-radius: 4px;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 12px;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      transition: all 0.2s ease;
-    }
-
-    .nav-btn:hover {
-      color: var(--text);
-      border-color: var(--text-dim);
-    }
-
-    .nav-btn.primary {
-      background: var(--text);
-      color: var(--panel);
-      border-color: var(--text);
-    }
-
-    .nav-btn.primary:hover {
-      opacity: 0.9;
-    }
-
-    .nav-btn.premium-btn {
-      background: #e8a33d;
-      /* Your instrument accent color */
-      color: #000;
-      border-color: #e8a33d;
-      font-weight: 600;
-    }
-
-    .nav-btn.danger:hover {
-      border-color: #ff6b6b;
-      color: #ff6b6b;
-    }
-
     /* === Custom dialog system (replaces browser alert/confirm/prompt) === */
     .dlg-overlay {
       position: fixed;
@@ -1006,36 +1071,33 @@
   <div class="app">
 
     <div class="topbar">
-      <h1>Setup Schematicizer</h1>
-      <span class="tagline">· &nbspCircuit-Grade Layout Design For Music Rigs</span>
 
-      <input class="name-input" id="setupName" value="Untitled setup" spellcheck="false">
-
-      <button class="btn primary" id="exportBtn">Export Setup</button>
-      <button class="btn" id="importBtn">Import Setup</button>
-      <button class="btn" id="newBtn">New</button>
-      <input type="file" id="fileImporter" accept=".json" style="display:none;">
-
-
-      <div class="spacer"></div>
-      <div class="spacer"></div>
-
-      <div class="zoom-controls">
-        <button id="zoomOut" title="Zoom Out">−</button>
-        <span class="zoom-level" id="zoomLevel">100%</span>
-        <button id="zoomIn" title="Zoom In">+</button>
-      </div>
-
-      <div class="nav-controls">
-
-
-        <div id="logged-out-group" style="display: flex; gap: 10px;">
-          <button id="btn-signin" class="nav-btn">Sign In</button>
-          <button id="btn-signup" class="nav-btn primary">Sign Up</button>
+      <div class="tb-left">
+        <div class="tb-brand">
+          <h1>Setup Schematicizer</h1>
+          <span class="tagline">· &nbsp;Circuit-Grade Layout Design For Music Rigs</span>
         </div>
 
-        <div id="logged-in-group" style="display: flex; gap: 10px; display: none;">
-          <button id="btn-save-cloud" class="nav-btn cloud-btn">
+        <div class="tb-group">
+          <input class="name-input" id="setupName" value="Untitled setup" spellcheck="false">
+          <button class="tb-btn" id="newBtn">Clear</button>
+          <button class="tb-btn auth-in" id="exportBtn" style="display:none;">Export</button>
+          <button class="tb-btn auth-in" id="importBtn" style="display:none;">Import</button>
+        </div>
+        <input type="file" id="fileImporter" accept=".json" style="display:none;">
+      </div>
+
+      <div class="tb-right">
+        <div class="tb-group">
+          <button id="btn-signin" class="tb-btn auth-out">Sign In</button>
+          <button id="btn-signup" class="tb-btn tb-btn--primary auth-out">Sign Up</button>
+          <button id="btn-signout" class="tb-btn tb-btn--danger auth-in" style="display:none;">Sign Out</button>
+        </div>
+
+        <div class="tb-divider auth-in" style="display:none;"></div>
+
+        <div class="tb-group">
+          <button id="btn-save-cloud" class="tb-btn tb-btn--cloud auth-in" style="display:none;">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
               style="width:14px;height:14px;">
               <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
@@ -1044,20 +1106,22 @@
             </svg>
             Save to Cloud
           </button>
-          <button id="btn-load-cloud" class="nav-btn cloud-btn">
+
+          <button id="btn-load-cloud" class="tb-btn tb-btn--cloud auth-in" style="display:none;">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
               style="width:14px;height:14px;">
               <path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z" />
             </svg>
             Load from Cloud
           </button>
-          <button id="btn-upgrade" class="nav-btn premium-btn">✨ Go Premium</button>
-          <button id="btn-signout" class="nav-btn danger">Sign Out</button>
         </div>
 
-      </div>
+        <span class="tb-status" id="status"></span>
 
-      <span class="status" id="status"></span>
+        <div class="tb-divider auth-in" style="display:none;"></div>
+
+        <button id="btn-upgrade" class="tb-btn tb-btn--premium auth-in" style="display:none;">✨ Go Premium</button>
+      </div>
     </div>
 
     <div class="main">
@@ -1069,6 +1133,9 @@
           - Drag from jack-to-jack to connect. <br>
           - Click on a cable to name or delete it. <br>
           - Hold <b>Space bar + Drag mouse</b> or use <b>Middle Click</b> to pan on the canvas. <br>
+          - Log in or create account to export setups, upgrade to premium to save to the cloud. <br>
+          <br>
+          Appreciate the support
         </div>
       </div>
 
@@ -1077,6 +1144,11 @@
           <div class="canvas" id="canvas">
             <svg class="cables" id="cablesSvg" width="4000" height="4000"></svg>
             <input class="cable-label-input" id="cableLabelInput" placeholder="name this cable…" spellcheck="false">
+          </div>
+          <div class="canvas-zoom">
+            <button id="zoomOut" title="Zoom Out">−</button>
+            <span class="zoom-level" id="zoomLevel">100%</span>
+            <button id="zoomIn" title="Zoom In">+</button>
           </div>
         </div>
       </div>
@@ -2008,19 +2080,19 @@
 
     // 5. BACKEND LISTENERS FOR STATE MANAGEMENT
     supabaseClient.auth.onAuthStateChange((event, session) => {
-      const loggedOutGroup = document.getElementById('logged-out-group');
-      const loggedInGroup = document.getElementById('logged-in-group');
+      const loggedOutElements = document.querySelectorAll('.auth-out');
+      const loggedInElements = document.querySelectorAll('.auth-in');
 
       if (session) {
-        // Switch visibility to authenticated layout
-        if (loggedOutGroup) loggedOutGroup.style.display = 'none';
-        if (loggedInGroup) loggedInGroup.style.display = 'flex';
+        // Authenticated User State
+        loggedOutElements.forEach(item => item.style.display = 'none');
+        loggedInElements.forEach(item => item.style.display = 'flex');
 
         checkPremiumStatus(session.user);
       } else {
-        // Revert layout back to default guest format
-        if (loggedOutGroup) loggedOutGroup.style.display = 'flex';
-        if (loggedInGroup) loggedInGroup.style.display = 'none';
+        // Guest State
+        loggedOutElements.forEach(item => item.style.display = 'flex');
+        loggedInElements.forEach(item => item.style.display = 'none');
       }
     });
 
@@ -2249,6 +2321,7 @@
     document.getElementById('btn-upgrade').addEventListener('click', () => {
       window.location.href = "https://buy.stripe.com/cNi28sbl2bUY2hSemE3Nm00";
     });
+
   </script>
 
 </body>
