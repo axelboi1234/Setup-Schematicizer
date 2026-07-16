@@ -929,6 +929,76 @@
       background: var(--danger);
       color: #2a0d0d;
     }
+
+    /* === Cloud rig manager (Load from Cloud) === */
+    /* Sits below .dlg-overlay's z-index so a Dialog.confirm (e.g. delete/overwrite)
+       opened from within the rig list always renders on top, regardless of DOM order. */
+    .rig-overlay {
+      z-index: 490;
+    }
+
+    .rig-box {
+      width: 440px;
+    }
+
+    .rig-list {
+      margin-top: 14px;
+      max-height: 320px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .rig-empty {
+      font-size: 12.5px;
+      line-height: 1.5;
+      color: var(--text-faint);
+      padding: 20px 4px;
+      text-align: center;
+    }
+
+    .rig-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      background: var(--panel);
+      border: 1px solid var(--border-soft);
+      border-radius: 5px;
+      padding: 8px 10px;
+    }
+
+    .rig-item-info {
+      min-width: 0;
+    }
+
+    .rig-item-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .rig-item-meta {
+      font-size: 10.5px;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text-faint);
+      margin-top: 2px;
+    }
+
+    .rig-item-actions {
+      display: flex;
+      gap: 6px;
+      flex: none;
+    }
+
+    .rig-item-actions .btn {
+      padding: 5px 10px;
+      font-size: 12px;
+    }
   </style>
 </head>
 
@@ -973,6 +1043,13 @@
               <polyline points="7 3 7 8 15 8" />
             </svg>
             Save to Cloud
+          </button>
+          <button id="btn-load-cloud" class="nav-btn cloud-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
+              style="width:14px;height:14px;">
+              <path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z" />
+            </svg>
+            Load from Cloud
           </button>
           <button id="btn-upgrade" class="nav-btn premium-btn">✨ Go Premium</button>
           <button id="btn-signout" class="nav-btn danger">Sign Out</button>
@@ -1793,6 +1870,25 @@
       document.getElementById('fileImporter').click();
     });
 
+    // Shared by file-import AND cloud-load, so both paths behave identically.
+    function applyImportedState(parsed, fallbackName) {
+      if (!parsed || !parsed.nodes || !parsed.connections) {
+        Dialog.alert("That data doesn't have the nodes/connections this app expects.", { kicker: 'ERROR', title: 'Load failed', accent: 'danger' });
+        return false;
+      }
+      state.nodes = parsed.nodes;
+      state.connections = parsed.connections;
+      idCounter = parsed.idCounter || (state.nodes.reduce((m, n) => Math.max(m, parseInt(n.id.slice(1)) || 0), 0) + 1);
+      zoom = parsed.zoom || 1.0;
+      panX = parsed.panX || 0;
+      panY = parsed.panY || 0;
+
+      document.getElementById('setupName').value = parsed.name || fallbackName || 'Imported setup';
+      selectedCableId = null;
+      render();
+      return true;
+    }
+
     document.getElementById('fileImporter').addEventListener('change', (e) => {
       const file = e.target.files[0];
       if (!file) return;
@@ -1801,21 +1897,7 @@
       reader.onload = function (evt) {
         try {
           const parsed = JSON.parse(evt.target.result);
-          if (parsed.nodes && parsed.connections) {
-            state.nodes = parsed.nodes;
-            state.connections = parsed.connections;
-            idCounter = parsed.idCounter || (state.nodes.reduce((m, n) => Math.max(m, parseInt(n.id.slice(1)) || 0), 0) + 1);
-            zoom = parsed.zoom || 1.0;
-            panX = parsed.panX || 0;
-            panY = parsed.panY || 0;
-
-            document.getElementById('setupName').value = parsed.name || 'Imported Setup';
-            selectedCableId = null;
-            render();
-            setStatus('Setup imported successfully!');
-          } else {
-            Dialog.alert("That file doesn't have the nodes/connections this app expects.", { kicker: 'ERROR', title: 'Import failed', accent: 'danger' });
-          }
+          if (applyImportedState(parsed)) setStatus('Setup imported successfully!');
         } catch (err) {
           Dialog.alert("Couldn't parse that as a workspace JSON file.", { kicker: 'ERROR', title: 'Import failed', accent: 'danger' });
         }
@@ -1964,26 +2046,212 @@
       await Dialog.alert('Your account has been disconnected.', { kicker: 'ACCOUNT', title: 'Signed out' });
     });
 
-    //PAYWALL CHECK TRIGGER LINK
-    document.getElementById('btn-save-cloud').addEventListener('click', async () => {
+    //Save setup to cloud function
+    async function saveRigToCloud(rigName, rigDataStructure) {
       const { data: { user } } = await supabaseClient.auth.getUser();
-      if (!user) return;
+      if (!user) {
+        await Dialog.alert('You must be signed in to save setups.', { kicker: 'ACCOUNT', title: 'Sign-in required' });
+        return false;
+      }
 
+      // Double-check premium status before allowing the write
       const isPaid = await checkPremiumStatus(user);
       if (!isPaid) {
         await Dialog.alert('Cloud save needs a premium subscription. Taking you to checkout…', { kicker: 'UPGRADE', title: 'Premium required', okText: 'Continue', accent: 'accessory' });
         window.location.href = "https://buy.stripe.com/cNi28sbl2bUY2hSemE3Nm00";
-      } else {
-        await Dialog.alert('Premium verified — running your export…', { kicker: 'ACCOUNT', title: 'Cloud storage ready', accent: 'daw' });
-        // Call your internal file export or JSON save routine functions here
+        return false;
       }
+
+      // See if a rig with this name already exists for this user, so re-saving
+      // overwrites it instead of piling up duplicate rows every click.
+      const { data: existing, error: findError } = await supabaseClient
+        .from('Rigs')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('name', rigName)
+        .maybeSingle();
+
+      if (findError) {
+        console.error("Lookup error:", findError.message);
+        await Dialog.alert('Failed to check for an existing save: ' + findError.message, { kicker: 'ERROR', title: 'Save Failed', accent: 'danger' });
+        return false;
+      }
+
+      let saveError;
+      if (existing) {
+        const ok = await Dialog.confirm(`A saved rig named "${rigName}" already exists. Overwrite it?`, { title: 'Overwrite existing save?', okText: 'Overwrite' });
+        if (!ok) return false;
+        const { error } = await supabaseClient.from('Rigs').update({ data: rigDataStructure }).eq('id', existing.id);
+        saveError = error;
+      } else {
+        const { error } = await supabaseClient
+          .from('Rigs')
+          .insert([
+            {
+              user_id: user.id,
+              name: rigName,
+              data: rigDataStructure // This should be an object containing your canvas/knob states
+            }
+          ]);
+        saveError = error;
+      }
+
+      if (saveError) {
+        console.error("Save error:", saveError.message);
+        await Dialog.alert('Failed to save configuration to cloud: ' + saveError.message, { kicker: 'ERROR', title: 'Save Failed', accent: 'danger' });
+        return false;
+      }
+
+      await Dialog.alert('Your setup has been saved to the cloud!', { kicker: 'SUCCESS', title: 'Setup Saved', accent: 'daw' });
+      return true;
+    }
+
+    //Load rigs from cloud function
+    async function loadUserRigs() {
+      const { data: { user } } = await supabaseClient.auth.getUser();
+      if (!user) return { rigs: [], error: null };
+
+      const { data, error } = await supabaseClient
+        .from('Rigs')
+        .select('*')
+        .eq('user_id', user.id); // Only get rigs that belong to THIS user
+
+      if (error) {
+        console.error("Loading error:", error.message);
+        return { rigs: [], error };
+      }
+
+      return { rigs: data || [], error: null }; // Array of this user's saved rigs
+    }
+
+    // === Cloud rig manager modal (Load from Cloud) ===
+    const RigManager = (() => {
+      let overlay, listEl;
+
+      function ensure() {
+        if (overlay) return;
+        overlay = document.createElement('div');
+        overlay.className = 'dlg-overlay rig-overlay';
+        overlay.innerHTML = `
+          <div class="dlg-box rig-box" role="dialog" aria-modal="true">
+            <div class="dlg-bar" style="background:var(--daw)"></div>
+            <div class="dlg-body">
+              <div class="dlg-kicker" style="color:var(--daw)">CLOUD STORAGE</div>
+              <div class="dlg-title">Load a saved rig</div>
+              <div class="rig-list"><div class="rig-empty">Loading…</div></div>
+              <div class="dlg-actions">
+                <button class="btn" data-rig-close>Close</button>
+              </div>
+            </div>
+          </div>`;
+        document.body.appendChild(overlay);
+        listEl = overlay.querySelector('.rig-list');
+
+        overlay.addEventListener('mousedown', (e) => { if (e.target === overlay) close(); });
+        overlay.querySelector('[data-rig-close]').addEventListener('click', close);
+        document.addEventListener('keydown', (e) => {
+          if (overlay.classList.contains('open') && e.key === 'Escape') close();
+        });
+      }
+
+      function close() {
+        if (overlay) overlay.classList.remove('open');
+      }
+
+      async function open() {
+        const { data: { user } } = await supabaseClient.auth.getUser();
+        if (!user) {
+          await Dialog.alert('You must be signed in to load setups.', { kicker: 'ACCOUNT', title: 'Sign-in required' });
+          return;
+        }
+        const isPaid = await checkPremiumStatus(user);
+        if (!isPaid) {
+          await Dialog.alert('Cloud load needs a premium subscription. Taking you to checkout…', { kicker: 'UPGRADE', title: 'Premium required', okText: 'Continue', accent: 'accessory' });
+          window.location.href = "https://buy.stripe.com/cNi28sbl2bUY2hSemE3Nm00";
+          return;
+        }
+        ensure();
+        overlay.classList.add('open');
+        await refresh();
+      }
+
+      async function refresh() {
+        listEl.innerHTML = `<div class="rig-empty">Loading…</div>`;
+        const { rigs, error } = await loadUserRigs();
+
+        if (error) {
+          listEl.innerHTML = `<div class="rig-empty">Couldn't load your saved rigs: ${esc(error.message)}</div>`;
+          return;
+        }
+        if (!rigs.length) {
+          listEl.innerHTML = `<div class="rig-empty">No saved rigs yet — use "Save to Cloud" first.</div>`;
+          return;
+        }
+
+        rigs.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+        listEl.innerHTML = rigs.map(r => `
+          <div class="rig-item">
+            <div class="rig-item-info">
+              <div class="rig-item-name">${esc(r.name || 'Untitled setup')}</div>
+              <div class="rig-item-meta">${r.created_at ? new Date(r.created_at).toLocaleString() : ''}</div>
+            </div>
+            <div class="rig-item-actions">
+              <button class="btn" data-rig-load="${r.id}">Load</button>
+              <button class="btn danger" data-rig-del="${r.id}" title="Delete">×</button>
+            </div>
+          </div>`).join('');
+
+        listEl.querySelectorAll('[data-rig-load]').forEach(btn => {
+          btn.addEventListener('click', () => loadRig(rigs.find(r => String(r.id) === btn.dataset.rigLoad)));
+        });
+        listEl.querySelectorAll('[data-rig-del]').forEach(btn => {
+          btn.addEventListener('click', () => removeRig(btn.dataset.rigDel));
+        });
+      }
+
+      async function loadRig(rig) {
+        if (!rig) return;
+        if (state.nodes.length) {
+          const ok = await Dialog.confirm('Loading will replace your current canvas. Unsaved changes will be lost.', { title: `Load "${rig.name}"?`, okText: 'Load' });
+          if (!ok) return;
+        }
+        if (applyImportedState(rig.data, rig.name)) {
+          close();
+          setStatus('Loaded "' + rig.name + '" from cloud.');
+        }
+      }
+
+      async function removeRig(id) {
+        const ok = await Dialog.confirm('This will permanently delete this saved rig from the cloud.', { title: 'Delete this rig?', okText: 'Delete' });
+        if (!ok) return;
+        const { error } = await supabaseClient.from('Rigs').delete().eq('id', id);
+        if (error) {
+          await Dialog.alert('Could not delete: ' + error.message, { kicker: 'ERROR', title: 'Delete failed', accent: 'danger' });
+          return;
+        }
+        await refresh();
+      }
+
+      return { open };
+    })();
+
+    //PAYWALL CHECK TRIGGER LINK
+    document.getElementById('btn-save-cloud').addEventListener('click', async () => {
+      const name = document.getElementById('setupName').value.trim() || 'Untitled setup';
+      const payload = { name, nodes: state.nodes, connections: state.connections, idCounter, zoom, panX, panY };
+      await saveRigToCloud(name, payload);
+    });
+
+    document.getElementById('btn-load-cloud').addEventListener('click', () => {
+      RigManager.open();
     });
 
     document.getElementById('btn-upgrade').addEventListener('click', () => {
       window.location.href = "https://buy.stripe.com/cNi28sbl2bUY2hSemE3Nm00";
     });
+    
   </script>
-
+  
 </body>
 
 </html>
