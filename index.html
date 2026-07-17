@@ -903,8 +903,12 @@
       border-radius: 7px;
       box-shadow: 0 12px 40px rgba(0, 0, 0, .55);
       transform: translateY(6px) scale(.98);
-      transition: transform .15s ease;
+      transition: transform .15s ease, width .15s ease;
       overflow: hidden;
+    }
+
+    .dlg-box.wide {
+      width: 460px;
     }
 
     .dlg-overlay.open .dlg-box {
@@ -940,6 +944,32 @@
       font-size: 13px;
       line-height: 1.55;
       color: var(--text-dim);
+    }
+
+    .dlg-message p {
+      margin: 0 0 10px;
+    }
+
+    .dlg-message p:last-child {
+      margin-bottom: 0;
+    }
+
+    .dlg-message ul {
+      margin: 0 0 10px;
+      padding-left: 18px;
+    }
+
+    .dlg-message li {
+      margin-bottom: 4px;
+    }
+
+    .dlg-message b,
+    .dlg-message strong {
+      color: var(--text);
+    }
+
+    .dlg-message a {
+      color: var(--dlg-accent, var(--instrument));
     }
 
     .dlg-fields {
@@ -1134,8 +1164,6 @@
           - Click on a cable to name or delete it. <br>
           - Hold <b>Space bar + Drag mouse</b> or use <b>Middle Click</b> to pan on the canvas. <br>
           - Log in or create account to export setups, upgrade to premium to save to the cloud. <br>
-          <br>
-          Appreciate the support
         </div>
       </div>
 
@@ -1199,9 +1227,10 @@
         if (resolver) { resolver(value); resolver = null; }
       }
 
-      function open({ kicker = '', title = '', message = '', fields = [], okText = 'OK', cancelText = 'Cancel', showCancel = false, accent = 'instrument' }) {
+      function open({ kicker = '', title = '', message = '', html = '', fields = [], okText = 'OK', cancelText = 'Cancel', showCancel = false, accent = 'instrument', wide = false }) {
         ensure();
         box.style.setProperty('--dlg-accent', `var(--${accent})`);
+        box.classList.toggle('wide', !!wide);
 
         const kickerEl = box.querySelector('.dlg-kicker');
         kickerEl.textContent = kicker;
@@ -1212,8 +1241,13 @@
         titleEl.style.display = title ? '' : 'none';
 
         const msgEl = box.querySelector('.dlg-message');
-        msgEl.textContent = message;
-        msgEl.style.display = message ? '' : 'none';
+        if (html) {
+          msgEl.innerHTML = html;
+          msgEl.style.display = '';
+        } else {
+          msgEl.textContent = message;
+          msgEl.style.display = message ? '' : 'none';
+        }
 
         const fieldsEl = box.querySelector('.dlg-fields');
         fieldsEl.innerHTML = fields.map(f => `
@@ -1256,8 +1290,43 @@
         },
         form(fields, opts = {}) {
           return open({ kicker: opts.kicker || '', title: opts.title || '', message: opts.message || '', fields, okText: opts.okText || 'Submit', cancelText: opts.cancelText || 'Cancel', showCancel: true, accent: opts.accent || 'instrument' });
+        },
+        welcome(opts = {}) {
+          return open({ kicker: opts.kicker ?? 'WELCOME', title: opts.title || '', html: opts.html || '', okText: opts.okText || 'Got it', accent: opts.accent || 'instrument', wide: true });
         }
       };
+    })();
+
+    // === First-visit welcome popup ===
+    // Shows once per browser (via localStorage), then never again unless the key below changes
+    // or the person clears their browser storage.
+    (function firstVisitWelcome() {
+      const SEEN_KEY = 'scd_welcome_seen_v1';
+      if (localStorage.getItem(SEEN_KEY)) return;
+      localStorage.setItem(SEEN_KEY, '1');
+
+      Dialog.welcome({
+        title: 'Welcome to Setup Schematicizer',
+        html: `
+          <!-- ============================================================ -->
+          <!--  ✏️  EDIT YOUR WELCOME TEXT HERE — everything between these  -->
+          <!--      two comment lines is what shows up in the popup.       -->
+          <!--      Use plain HTML: <p> for paragraphs, <b> for bold,      -->
+          <!--      <ul><li> for bullet lists, <br> for line breaks, etc.  -->
+          <!-- ============================================================ -->
+          <p>- Drag modules by their colored top bars. </p>
+          <p>- Drag from jack-to-jack to connect. </p>
+          <p>- Click on a cable to name or delete it.  </p>
+          <p>- Hold <b>Space bar + Drag mouse</b> or use <b>Middle Click</b> to pan on the canvas. </p>
+          <p>- Log in or create account to export setups, upgrade to premium to save to the cloud. </p>
+          <p></p>
+          <p>For support, raise an issue at <a href="https://github.com/axelboi1234/Setup-Schematicizer">here</a></p>
+          <p>This information is accessable from the bottom of the sidebar</p>
+          <!-- ============================================================ -->
+          <!--  END EDITABLE TEXT                                          -->
+          <!-- ============================================================ -->
+        `
+      });
     })();
   </script>
 
