@@ -347,9 +347,13 @@
     }
 
     details.cat-group summary::before {
-      content: '▸';
-      font-size: 9px;
-      color: var(--text-faint);
+      content: '';
+      width: 0;
+      height: 0;
+      border-style: solid;
+      border-width: 4px 0 4px 6px;
+      border-color: transparent transparent transparent var(--text-dim);
+      flex: none;
       display: inline-block;
       transition: transform .15s;
     }
@@ -386,13 +390,18 @@
       font-weight: 500;
       padding: 7px 8px;
       border-radius: 4px;
-      cursor: pointer;
+      cursor: grab;
       margin: 0 0 5px 3px;
       text-align: left;
     }
 
+    .palette-item:active {
+      cursor: grabbing;
+    }
+
     .palette-item:hover {
       background: #332e26;
+      border-left-width: 5px;
     }
 
     .sidebar .hint {
@@ -517,11 +526,15 @@
     }
 
     .node-bar {
-      height: 6px;
+      height: 18px;
       border-radius: 5px 5px 0 0;
       background: var(--nc);
       cursor: grab;
       user-select: none;
+      background-image: repeating-linear-gradient(90deg, rgba(0, 0, 0, .18) 0 2px, transparent 2px 6px);
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: 28px 8px;
     }
 
     .node-bar:active {
@@ -560,7 +573,7 @@
 
     .node-del {
       position: absolute;
-      top: 8px;
+      top: 20px;
       right: 9px;
       width: 16px;
       height: 16px;
@@ -1223,7 +1236,7 @@
               style="width:14px;height:14px;">
               <path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z" />
             </svg>
-            Load from Cloud
+            Manage Cloud
           </button>
         </div>
 
@@ -1246,7 +1259,7 @@
           - Hold <b>Space bar + Drag mouse</b> or use <b>Middle Click</b> to pan on the canvas. <br>
           - Log in or create account to export setups, upgrade to premium to save to the cloud. <br>
           <br>
-          Appreciate the support
+          For support, raise an issue <a href="https://github.com/axelboi1234/Setup-Schematicizer">here</a>
         </div>
       </div>
 
@@ -1424,8 +1437,14 @@
           <!--      Use plain HTML: <p> for paragraphs, <b> for bold,      -->
           <!--      <ul><li> for bullet lists, <br> for line breaks, etc.  -->
           <!-- ============================================================ -->
-          <p>Put your welcome message here. This is the first thing a new visitor sees.</p>
-          <p>You can add a second paragraph, a short feature list, a link — whatever you'd like.</p>
+          <p>- Drag modules by their colored top bars. </p>
+          <p>- Drag from jack-to-jack to connect. </p>
+          <p>- Click on a cable to name or delete it.  </p>
+          <p>- Hold <b>Space bar + Drag mouse</b> or use <b>Middle Click</b> to pan on the canvas. </p>
+          <p>- Log in or create account to export setups, upgrade to premium to save to the cloud. </p>
+          <p></p>
+          <p>For support, raise an issue <a href="https://github.com/axelboi1234/Setup-Schematicizer">here</a></p>
+          <p>This information is accessable from the bottom of the sidebar</p>
           <!-- ============================================================ -->
           <!--  END EDITABLE TEXT                                          -->
           <!-- ============================================================ -->
@@ -1579,7 +1598,7 @@
 
     function nodeRows(n) { return Math.max(1, n.inPorts.length, n.outPorts.length); }
     function headerHeightOf(n) {
-      let h = 54;
+      let h = 66;
       if (ADJUSTABLE_CATS.includes(n.cat)) h += 28;
       if (n.cat === 'other') h += 24;
       if (n.cat === 'daw') { h += 16 + n.inPorts.length * 20 + n.outPorts.length * 36; }
@@ -1598,9 +1617,9 @@
       return { x: 100 + col * 272, y: 100 + row * 380 };
     }
 
-    function addNode(gearDef) {
+    function addNode(gearDef, posOverride) {
       const id = 'n' + (idCounter++);
-      const pos = nextPosition();
+      const pos = posOverride || nextPosition();
       state.nodes.push({
         id, cat: gearDef.cat, label: gearDef.label, sub: '', x: pos.x, y: pos.y,
         inPorts: clonePorts(gearDef.inPorts, false), outPorts: clonePorts(gearDef.outPorts, true),
@@ -1968,23 +1987,36 @@
       if (pendingConn) { tryCompleteConnection(e.target); pendingConn = null; renderCables(); }
     });
 
+    // Zoom around a specific screen point (cursor for wheel, viewport center for the +/- buttons)
+    // instead of always scaling from the canvas element's fixed (0,0) origin — that fixed-origin
+    // scaling was the cause of zoom always appearing to pull everything toward the top-left corner.
+    function zoomAt(clientX, clientY, factor) {
+      const rect = viewport.getBoundingClientRect();
+      const px = clientX - rect.left;
+      const py = clientY - rect.top;
+      const newZoom = Math.max(0.4, Math.min(1.5, zoom * factor));
+      if (newZoom === zoom) return;
+      panX = px - (px - panX) * (newZoom / zoom);
+      panY = py - (py - panY) * (newZoom / zoom);
+      zoom = newZoom;
+      updateTransform();
+    }
+
     // Zoom Interactions (Mouse Wheel)
     viewport.addEventListener('wheel', (e) => {
       if (e.ctrlKey || Math.abs(e.deltaY) > 0) {
         e.preventDefault();
-        const zoomFactor = 1.1;
-        if (e.deltaY < 0) {
-          zoom = Math.min(1.5, zoom * zoomFactor);
-        } else {
-          zoom = Math.max(0.4, zoom / zoomFactor);
-        }
-        updateTransform();
+        zoomAt(e.clientX, e.clientY, e.deltaY < 0 ? 1.1 : 1 / 1.1);
       }
     }, { passive: false });
 
-    // Topbar Zoom Button UI
-    document.getElementById('zoomIn').addEventListener('click', () => { zoom = Math.min(1.5, zoom * 1.1); updateTransform(); });
-    document.getElementById('zoomOut').addEventListener('click', () => { zoom = Math.max(0.4, zoom / 1.1); updateTransform(); });
+    // Topbar Zoom Button UI — zoom around the center of the visible canvas area
+    function zoomAtViewportCenter(factor) {
+      const rect = viewport.getBoundingClientRect();
+      zoomAt(rect.left + rect.width / 2, rect.top + rect.height / 2, factor);
+    }
+    document.getElementById('zoomIn').addEventListener('click', () => zoomAtViewportCenter(1.1));
+    document.getElementById('zoomOut').addEventListener('click', () => zoomAtViewportCenter(1 / 1.1));
 
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
@@ -2038,7 +2070,7 @@
       const root = document.getElementById('paletteRoot');
       root.innerHTML = CAT_ORDER.map(cat => {
         const items = GEAR.map((g, idx) => ({ g, idx })).filter(x => x.g.cat === cat).map(({ g, idx }) =>
-          `<button class="palette-item" style="--nc:var(--${cat})" data-idx="${idx}" data-search="${esc(g.label.toLowerCase())}">${esc(g.label)}</button>`
+          `<button class="palette-item" draggable="true" style="--nc:var(--${cat})" data-idx="${idx}" data-search="${esc(g.label.toLowerCase())}">${esc(g.label)}</button>`
         ).join('');
         return `<details class="cat-group" open data-cat="${cat}">
       <summary><span class="swatch" style="background:var(--${cat})"></span>${esc(CATS[cat].label)}</summary>
@@ -2053,6 +2085,33 @@
       if (!btn) return;
       const g = GEAR[parseInt(btn.dataset.idx, 10)];
       if (g) { addNode(g); render(); }
+    });
+
+    // Drag a palette item onto the canvas to drop it exactly where the cursor lands
+    document.getElementById('paletteRoot').addEventListener('dragstart', (e) => {
+      const btn = e.target.closest('.palette-item');
+      if (!btn) return;
+      e.dataTransfer.setData('text/plain', btn.dataset.idx);
+      e.dataTransfer.effectAllowed = 'copy';
+    });
+
+    viewport.addEventListener('dragover', (e) => {
+      if (!e.dataTransfer.types.includes('text/plain')) return;
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'copy';
+    });
+
+    viewport.addEventListener('drop', (e) => {
+      const idxStr = e.dataTransfer.getData('text/plain');
+      if (idxStr === '') return;
+      e.preventDefault();
+      const g = GEAR[parseInt(idxStr, 10)];
+      if (!g) return;
+      const rect = canvas.getBoundingClientRect();
+      const x = Math.max(0, (e.clientX - rect.left) / zoom - NODE_W / 2);
+      const y = Math.max(0, (e.clientY - rect.top) / zoom - 18);
+      addNode(g, { x, y });
+      render();
     });
 
     document.getElementById('gearSearch').addEventListener('input', (e) => {
