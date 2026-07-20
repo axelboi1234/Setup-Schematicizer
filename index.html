@@ -1008,6 +1008,30 @@
       border-color: transparent;
     }
 
+    .dlg-field-row {
+      display: flex;
+      gap: 6px;
+    }
+
+    .dlg-field-row input {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .dlg-field-row .btn {
+      flex: none;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11.5px;
+    }
+
+    .rig-public-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9.5px;
+      letter-spacing: .04em;
+      color: var(--looper);
+      margin-left: 6px;
+    }
+
     .dlg-actions {
       display: flex;
       justify-content: flex-end;
@@ -1094,6 +1118,63 @@
       padding: 5px 10px;
       font-size: 12px;
     }
+
+    .rig-owner-note {
+      font-size: 10px;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text-faint);
+      padding: 5px 2px;
+    }
+
+    /* === Share settings modal (public link + per-person access) === */
+    .share-overlay {
+      z-index: 495;
+    }
+
+    .share-section-title {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: var(--text-faint);
+      margin-bottom: 7px;
+    }
+
+    #share-url {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+    }
+
+    .share-people {
+      margin-top: 10px;
+      max-height: 180px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .share-person {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      background: var(--panel);
+      border: 1px solid var(--border-soft);
+      border-radius: 5px;
+      padding: 7px 10px;
+      font-size: 12.5px;
+      color: var(--text-dim);
+    }
+
+    .share-person button {
+      flex: none;
+      width: 22px;
+      height: 22px;
+      padding: 0;
+      font-size: 13px;
+      line-height: 1;
+    }
   </style>
 </head>
 
@@ -1165,7 +1246,7 @@
           - Hold <b>Space bar + Drag mouse</b> or use <b>Middle Click</b> to pan on the canvas. <br>
           - Log in or create account to export setups, upgrade to premium to save to the cloud. <br>
           <br>
-          For support, raise an issue <a href="https://github.com/axelboi1234/Setup-Schematicizer">here</a>
+          Appreciate the support
         </div>
       </div>
 
@@ -1255,9 +1336,26 @@
         fieldsEl.innerHTML = fields.map(f => `
             <label class="dlg-field">
               <span>${f.label}</span>
-              <input type="${f.type || 'text'}" data-dlg-field="${f.key}" placeholder="${f.placeholder || ''}" autocomplete="${f.autocomplete || 'off'}">
+              <div class="dlg-field-row">
+                <input type="${f.type || 'text'}" data-dlg-field="${f.key}" placeholder="${f.placeholder || ''}"
+                  value="${(f.value || '').replace(/"/g, '&quot;')}" ${f.readonly ? 'readonly' : ''}
+                  autocomplete="${f.autocomplete || 'off'}">
+                ${f.copyable ? `<button type="button" class="btn" data-dlg-copy="${f.key}">Copy</button>` : ''}
+              </div>
             </label>`).join('');
         fieldsEl.style.display = fields.length ? '' : 'none';
+        fieldsEl.querySelectorAll('[data-dlg-copy]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const input = fieldsEl.querySelector(`[data-dlg-field="${btn.dataset.dlgCopy}"]`);
+            input.select();
+            const done = () => { const orig = btn.textContent; btn.textContent = 'Copied!'; setTimeout(() => { btn.textContent = orig; }, 1400); };
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+              navigator.clipboard.writeText(input.value).then(done).catch(() => { document.execCommand('copy'); done(); });
+            } else {
+              document.execCommand('copy'); done();
+            }
+          });
+        });
 
         const actionsEl = box.querySelector('.dlg-actions');
         actionsEl.innerHTML = (showCancel ? `<button class="btn" data-dlg-cancel>${cancelText}</button>` : '') +
@@ -1295,6 +1393,16 @@
         },
         welcome(opts = {}) {
           return open({ kicker: opts.kicker ?? 'WELCOME', title: opts.title || '', html: opts.html || '', okText: opts.okText || 'Got it', accent: opts.accent || 'instrument', wide: true });
+        },
+        shareLink(url, opts = {}) {
+          return open({
+            kicker: opts.kicker ?? 'SHARE',
+            title: opts.title || 'Share this setup',
+            html: opts.html || '<p>Anyone with this link can open a read-only copy of this setup — no account needed.</p>',
+            fields: [{ key: 'url', label: 'Shareable link', value: url, readonly: true, copyable: true }],
+            okText: opts.okText || 'Done',
+            accent: opts.accent || 'looper'
+          });
         }
       };
     })();
@@ -1308,7 +1416,7 @@
       localStorage.setItem(SEEN_KEY, '1');
 
       Dialog.welcome({
-        title: 'Welcome to Setup Schematicizer',
+        title: 'Welcome to Signal Chain Designer',
         html: `
           <!-- ============================================================ -->
           <!--  ✏️  EDIT YOUR WELCOME TEXT HERE — everything between these  -->
@@ -1316,14 +1424,8 @@
           <!--      Use plain HTML: <p> for paragraphs, <b> for bold,      -->
           <!--      <ul><li> for bullet lists, <br> for line breaks, etc.  -->
           <!-- ============================================================ -->
-          <p>- Drag modules by their colored top bars. </p>
-          <p>- Drag from jack-to-jack to connect. </p>
-          <p>- Click on a cable to name or delete it.  </p>
-          <p>- Hold <b>Space bar + Drag mouse</b> or use <b>Middle Click</b> to pan on the canvas. </p>
-          <p>- Log in or create account to export setups, upgrade to premium to save to the cloud. </p>
-          <p></p>
-          <p>For support, raise an issue <a href="https://github.com/axelboi1234/Setup-Schematicizer">here</a></p>
-          <p>This information is accessable from the bottom of the sidebar</p>
+          <p>Put your welcome message here. This is the first thing a new visitor sees.</p>
+          <p>You can add a second paragraph, a short feature list, a link — whatever you'd like.</p>
           <!-- ============================================================ -->
           <!--  END EDITABLE TEXT                                          -->
           <!-- ============================================================ -->
@@ -2254,17 +2356,36 @@
       const { data: { user } } = await supabaseClient.auth.getUser();
       if (!user) return { rigs: [], error: null };
 
-      const { data, error } = await supabaseClient
+      const { data: owned, error } = await supabaseClient
         .from('Rigs')
         .select('*')
-        .eq('user_id', user.id); // Only get rigs that belong to THIS user
+        .eq('user_id', user.id); // Rigs this user created
 
       if (error) {
         console.error("Loading error:", error.message);
         return { rigs: [], error };
       }
 
-      return { rigs: data || [], error: null }; // Array of this user's saved rigs
+      // Rigs someone else created but shared directly with this user.
+      // Wrapped so a missing rig_shares table (before the SQL setup below is run)
+      // just means "no shared rigs yet" instead of breaking the whole list.
+      let sharedRigs = [];
+      const { data: shares } = await supabaseClient
+        .from('rig_shares')
+        .select('rig_id')
+        .eq('shared_with', user.id);
+
+      if (shares && shares.length) {
+        const { data: sharedData } = await supabaseClient
+          .from('Rigs')
+          .select('*')
+          .in('id', shares.map(s => s.rig_id));
+        sharedRigs = sharedData || [];
+      }
+
+      const ownedTagged = (owned || []).map(r => ({ ...r, isOwner: true }));
+      const sharedTagged = sharedRigs.map(r => ({ ...r, isOwner: false }));
+      return { rigs: [...ownedTagged, ...sharedTagged], error: null }; // Array of accessible rigs
     }
 
     // === Cloud rig manager modal (Load from Cloud) ===
@@ -2335,17 +2456,21 @@
         listEl.innerHTML = rigs.map(r => `
           <div class="rig-item">
             <div class="rig-item-info">
-              <div class="rig-item-name">${esc(r.name || 'Untitled setup')}</div>
+              <div class="rig-item-name">${esc(r.name || 'Untitled setup')}${r.is_public ? '<span class="rig-public-badge">● public</span>' : ''}${!r.isOwner ? '<span class="rig-public-badge">● shared with you</span>' : ''}</div>
               <div class="rig-item-meta">${r.created_at ? new Date(r.created_at).toLocaleString() : ''}</div>
             </div>
             <div class="rig-item-actions">
               <button class="btn" data-rig-load="${r.id}">Load</button>
-              <button class="btn danger" data-rig-del="${r.id}" title="Delete">×</button>
+              ${r.isOwner ? `<button class="btn" data-rig-share="${r.id}">Share</button>` : ''}
+              ${r.isOwner ? `<button class="btn danger" data-rig-del="${r.id}" title="Delete">×</button>` : ''}
             </div>
           </div>`).join('');
 
         listEl.querySelectorAll('[data-rig-load]').forEach(btn => {
           btn.addEventListener('click', () => loadRig(rigs.find(r => String(r.id) === btn.dataset.rigLoad)));
+        });
+        listEl.querySelectorAll('[data-rig-share]').forEach(btn => {
+          btn.addEventListener('click', () => ShareManager.open(rigs.find(r => String(r.id) === btn.dataset.rigShare)));
         });
         listEl.querySelectorAll('[data-rig-del]').forEach(btn => {
           btn.addEventListener('click', () => removeRig(btn.dataset.rigDel));
@@ -2375,7 +2500,185 @@
         await refresh();
       }
 
+      return { open, refresh };
+    })();
+
+    // === Share settings modal: public link + direct per-person access ===
+    const ShareManager = (() => {
+      let overlay, currentRig;
+
+      function ensure() {
+        if (overlay) return;
+        overlay = document.createElement('div');
+        overlay.className = 'dlg-overlay share-overlay';
+        overlay.innerHTML = `
+          <div class="dlg-box rig-box" role="dialog" aria-modal="true">
+            <div class="dlg-bar" style="background:var(--looper)"></div>
+            <div class="dlg-body">
+              <div class="dlg-kicker" style="color:var(--looper)">SHARE</div>
+              <div class="dlg-title" id="share-title">Share this setup</div>
+
+              <div class="share-section-title">Public link</div>
+              <div class="dlg-field-row">
+                <input type="text" id="share-url" readonly>
+                <button type="button" class="btn" id="share-copy-btn">Copy</button>
+              </div>
+              <button type="button" class="btn" id="share-toggle-public" style="margin-top:8px;"></button>
+
+              <div class="share-section-title" style="margin-top:16px;">Give a specific person access</div>
+              <div class="dlg-field-row">
+                <input type="email" id="share-invite-email" placeholder="them@example.com" autocomplete="off">
+                <button type="button" class="btn primary" id="share-invite-btn">Add</button>
+              </div>
+              <div class="share-people"><div class="rig-empty">No one yet.</div></div>
+
+              <div class="dlg-actions">
+                <button class="btn" id="share-close-btn">Close</button>
+              </div>
+            </div>
+          </div>`;
+        document.body.appendChild(overlay);
+
+        overlay.addEventListener('mousedown', (e) => { if (e.target === overlay) close(); });
+        overlay.querySelector('#share-close-btn').addEventListener('click', close);
+        document.addEventListener('keydown', (e) => { if (overlay.classList.contains('open') && e.key === 'Escape') close(); });
+
+        overlay.querySelector('#share-copy-btn').addEventListener('click', () => {
+          const input = overlay.querySelector('#share-url');
+          input.select();
+          const flash = () => {
+            const btn = overlay.querySelector('#share-copy-btn');
+            const orig = btn.textContent; btn.textContent = 'Copied!';
+            setTimeout(() => { btn.textContent = orig; }, 1400);
+          };
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(input.value).then(flash).catch(() => { document.execCommand('copy'); flash(); });
+          } else {
+            document.execCommand('copy'); flash();
+          }
+        });
+
+        overlay.querySelector('#share-toggle-public').addEventListener('click', togglePublic);
+        overlay.querySelector('#share-invite-btn').addEventListener('click', inviteByEmail);
+      }
+
+      function close() { if (overlay) overlay.classList.remove('open'); }
+
+      async function open(rig) {
+        if (!rig) return;
+        currentRig = rig;
+        ensure();
+        overlay.classList.add('open');
+        overlay.querySelector('#share-title').textContent = `Share "${rig.name}"`;
+        overlay.querySelector('#share-url').value = `${location.origin}${location.pathname}?rig=${rig.id}`;
+        renderPublicToggle();
+        await refreshPeople();
+      }
+
+      function renderPublicToggle() {
+        const btn = overlay.querySelector('#share-toggle-public');
+        btn.textContent = currentRig.is_public ? 'Disable public link' : 'Enable public link';
+        btn.className = currentRig.is_public ? 'btn danger' : 'btn';
+      }
+
+      async function togglePublic() {
+        const next = !currentRig.is_public;
+        const { error } = await supabaseClient.from('Rigs').update({ is_public: next }).eq('id', currentRig.id);
+        if (error) {
+          await Dialog.alert('Could not update: ' + error.message, { kicker: 'ERROR', title: 'Update failed', accent: 'danger' });
+          return;
+        }
+        currentRig.is_public = next;
+        renderPublicToggle();
+        await RigManager.refresh();
+      }
+
+      async function inviteByEmail() {
+        const input = overlay.querySelector('#share-invite-email');
+        const email = input.value.trim();
+        if (!email) return;
+
+        const { data: userId, error: lookupError } = await supabaseClient.rpc('find_user_id_by_email', { lookup_email: email });
+        if (lookupError || !userId) {
+          await Dialog.alert("No account found with that email — they'll need to sign up first.", { kicker: 'NOT FOUND', title: "Can't find that user", accent: 'danger' });
+          return;
+        }
+
+        const { data: { user } } = await supabaseClient.auth.getUser();
+        if (userId === user.id) {
+          await Dialog.alert("That's your own account — you already have access.", { kicker: 'NOTICE', title: 'No need' });
+          return;
+        }
+
+        const { error } = await supabaseClient.from('rig_shares').insert({ rig_id: currentRig.id, shared_with: userId });
+        if (error && error.code !== '23505') { // 23505 = already shared, treat as success
+          await Dialog.alert('Could not add: ' + error.message, { kicker: 'ERROR', title: 'Failed', accent: 'danger' });
+          return;
+        }
+        input.value = '';
+        await refreshPeople();
+      }
+
+      async function refreshPeople() {
+        const peopleEl = overlay.querySelector('.share-people');
+        peopleEl.innerHTML = `<div class="rig-empty">Loading…</div>`;
+        const { data, error } = await supabaseClient
+          .from('rig_shares')
+          .select('shared_with, profiles(email)')
+          .eq('rig_id', currentRig.id);
+
+        if (error) {
+          peopleEl.innerHTML = `<div class="rig-empty">Couldn't load: ${esc(error.message)}</div>`;
+          return;
+        }
+        if (!data.length) {
+          peopleEl.innerHTML = `<div class="rig-empty">No one yet — invite someone above.</div>`;
+          return;
+        }
+        peopleEl.innerHTML = data.map(row => `
+          <div class="share-person">
+            <span>${esc(row.profiles && row.profiles.email ? row.profiles.email : 'Unknown user')}</span>
+            <button class="btn danger" data-unshare="${row.shared_with}" title="Remove access">×</button>
+          </div>`).join('');
+        peopleEl.querySelectorAll('[data-unshare]').forEach(btn => {
+          btn.addEventListener('click', () => removePerson(btn.dataset.unshare));
+        });
+      }
+
+      async function removePerson(userId) {
+        const { error } = await supabaseClient.from('rig_shares').delete().eq('rig_id', currentRig.id).eq('shared_with', userId);
+        if (error) {
+          await Dialog.alert('Could not remove: ' + error.message, { kicker: 'ERROR', title: 'Failed', accent: 'danger' });
+          return;
+        }
+        await refreshPeople();
+      }
+
       return { open };
+    })();
+
+    // === Load a shared rig if the URL has ?rig=<id> ===
+    // Works whether the rig is public, or was shared directly with the signed-in visitor —
+    // access is entirely decided by the Rigs table's RLS policies, not this code.
+    (async function loadSharedRigFromUrl() {
+      const rigId = new URLSearchParams(location.search).get('rig');
+      if (!rigId) return;
+
+      const { data, error } = await supabaseClient
+        .from('Rigs')
+        .select('name, data')
+        .eq('id', rigId)
+        .maybeSingle();
+
+      if (error || !data) {
+        const { data: { user } } = await supabaseClient.auth.getUser();
+        setStatus(user
+          ? "This setup isn't public and hasn't been shared with your account."
+          : 'Sign in to view this shared setup — or it may not be public.');
+        return;
+      }
+      applyImportedState(data.data, data.name);
+      setStatus('Loaded shared setup "' + (data.name || 'Untitled setup') + '".');
     })();
 
     //PAYWALL CHECK TRIGGER LINK
