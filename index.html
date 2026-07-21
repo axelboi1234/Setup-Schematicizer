@@ -1188,6 +1188,424 @@
       font-size: 13px;
       line-height: 1;
     }
+
+    /* === Stage Plot (premium feature) === */
+    .tb-btn--stage svg {
+      color: var(--monitor);
+    }
+
+    .tb-btn--stage:hover {
+      border-color: var(--monitor);
+      color: var(--text);
+    }
+
+    .stage-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .66);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 600;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .15s ease;
+    }
+
+    .stage-overlay.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .stage-modal {
+      width: 94vw;
+      height: 90vh;
+      max-width: 1400px;
+      background: linear-gradient(180deg, var(--panel2) 0%, var(--panel3) 100%);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, .6);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transform: translateY(8px) scale(.98);
+      transition: transform .15s ease;
+    }
+
+    .stage-overlay.open .stage-modal {
+      transform: translateY(0) scale(1);
+    }
+
+    .stage-topbar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      background: var(--panel);
+      flex: none;
+    }
+
+    .stage-topbar h2 {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: .03em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin: 0 6px 0 0;
+    }
+
+    .stage-topbar .tb-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .stage-dim-input {
+      width: 48px;
+      background: var(--panel2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      padding: 6px 7px;
+      border-radius: 4px;
+      text-align: center;
+    }
+
+    .stage-dim-input:focus {
+      outline: 1px solid var(--monitor);
+    }
+
+    .stage-dim-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10.5px;
+      color: var(--text-faint);
+    }
+
+    .stage-toggle {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11.5px;
+      color: var(--text-dim);
+      cursor: pointer;
+      user-select: none;
+      background: var(--panel2);
+      border: 1px solid var(--border);
+      padding: 6px 10px;
+      border-radius: 5px;
+    }
+
+    .stage-toggle input {
+      accent-color: var(--monitor);
+    }
+
+    .stage-close {
+      margin-left: auto;
+      background: var(--panel2);
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      width: 30px;
+      height: 30px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+      line-height: 1;
+      flex: none;
+    }
+
+    .stage-close:hover {
+      border-color: var(--danger);
+      color: var(--danger);
+    }
+
+    .stage-body {
+      flex: 1;
+      display: flex;
+      min-height: 0;
+    }
+
+    .stage-sidebar {
+      width: 190px;
+      flex: none;
+      background: var(--panel);
+      border-right: 1px solid var(--border);
+      padding: 12px;
+      overflow-y: auto;
+    }
+
+    .stage-sidebar .search-input {
+      margin-bottom: 10px;
+    }
+
+    .stage-palette-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+      background: var(--panel2);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--monitor);
+      color: var(--text);
+      font-size: 12px;
+      font-weight: 500;
+      padding: 7px 8px;
+      border-radius: 4px;
+      cursor: grab;
+      margin: 0 0 6px;
+      text-align: left;
+    }
+
+    .stage-palette-item:active {
+      cursor: grabbing;
+    }
+
+    .stage-palette-item:hover {
+      background: #332e26;
+      border-left-width: 5px;
+    }
+
+    .stage-palette-item svg {
+      width: 16px;
+      height: 16px;
+      flex: none;
+      color: var(--monitor);
+    }
+
+    .stage-sidebar .hint {
+      font-size: 11px;
+      line-height: 1.55;
+      color: var(--text-faint);
+      margin-top: 10px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border-soft);
+    }
+
+    .stage-canvas-col {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      background: #141210;
+    }
+
+    .stage-canvas-wrap {
+      flex: 1;
+      overflow: auto;
+      position: relative;
+      text-align: center;
+    }
+
+    .stage-surface-outer {
+      display: inline-block;
+      margin: 44px auto 70px;
+      position: relative;
+    }
+
+    .stage-surface {
+      position: relative;
+      background-color: #1c1a17;
+      background-image: linear-gradient(#332e26 1px, transparent 1px), linear-gradient(90deg, #332e26 1px, transparent 1px);
+      background-size: 0 0;
+      border: 2px dashed var(--text-faint);
+      border-radius: 4px;
+    }
+
+    .stage-foh {
+      position: absolute;
+      left: 50%;
+      bottom: -40px;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
+    .stage-foh svg {
+      color: var(--text-faint);
+      width: 20px;
+      height: 20px;
+    }
+
+    .stage-foh span {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9.5px;
+      letter-spacing: .08em;
+      color: var(--text-faint);
+      text-transform: uppercase;
+    }
+
+    .stage-item {
+      position: absolute;
+      width: 58px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      cursor: grab;
+      user-select: none;
+      z-index: 2;
+    }
+
+    .stage-item:active {
+      cursor: grabbing;
+      z-index: 3;
+    }
+
+    .stage-item-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: var(--panel2);
+      border: 2px solid var(--monitor);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--monitor);
+      position: relative;
+      box-shadow: 0 3px 8px rgba(0, 0, 0, .4);
+      flex: none;
+    }
+
+    .stage-item-icon svg {
+      width: 22px;
+      height: 22px;
+    }
+
+    .stage-item-badge {
+      position: absolute;
+      top: -6px;
+      left: -6px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--monitor);
+      color: #241a08;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .stage-item-del {
+      position: absolute;
+      top: -6px;
+      right: -6px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--danger);
+      color: #2a0d0d;
+      border: none;
+      font-size: 11px;
+      line-height: 1;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+    }
+
+    .stage-item:hover .stage-item-del {
+      display: flex;
+    }
+
+    .stage-item-rotate {
+      position: absolute;
+      bottom: -6px;
+      right: -6px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--panel3);
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      font-size: 9px;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+    }
+
+    .stage-item:hover .stage-item-rotate {
+      display: flex;
+    }
+
+    .stage-item-label {
+      max-width: 74px;
+      background: transparent;
+      border: none;
+      color: var(--text);
+      font-size: 10.5px;
+      text-align: center;
+      font-family: 'JetBrains Mono', monospace;
+      cursor: text;
+    }
+
+    .stage-item-label:focus {
+      outline: none;
+      border-bottom: 1px solid var(--text-faint);
+    }
+
+    .stage-list-panel {
+      width: 220px;
+      flex: none;
+      background: var(--panel);
+      border-left: 1px solid var(--border);
+      padding: 12px;
+      overflow-y: auto;
+    }
+
+    .stage-list-title {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: var(--text-faint);
+      margin-bottom: 8px;
+    }
+
+    .stage-list-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 0;
+      border-bottom: 1px solid var(--border-soft);
+      font-size: 12px;
+      color: var(--text-dim);
+    }
+
+    .stage-list-num {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--monitor);
+      color: #241a08;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9.5px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex: none;
+    }
+
+    .stage-list-empty {
+      color: var(--text-faint);
+      font-size: 12px;
+      padding: 8px 2px;
+    }
   </style>
 </head>
 
@@ -1237,6 +1655,16 @@
               <path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z" />
             </svg>
             Manage Cloud
+          </button>
+
+          <button id="btn-stageplot" class="tb-btn tb-btn--stage auth-in" style="display:none;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
+              style="width:14px;height:14px;">
+              <path d="M3 20h18" />
+              <path d="M6 20l1-9a5 5 0 0 1 10 0l1 9" />
+              <circle cx="12" cy="7" r="2" />
+            </svg>
+            Stage Plot ✨
           </button>
         </div>
 
@@ -2753,6 +3181,348 @@
 
     document.getElementById('btn-upgrade').addEventListener('click', () => {
       window.location.href = "https://buy.stripe.com/cNi28sbl2bUY2hSemE3Nm00";
+    });
+
+    // === Stage Plot (premium feature) ===================================
+    // A separate, self-contained popup for planning physical stage layout —
+    // where people/mics/monitors/amps stand — as opposed to the signal-flow
+    // canvas behind it. Deliberately kept independent of `state`/`nodes` so
+    // it works whether or not a signal chain has been built yet.
+
+    const STAGE_ICONS = {
+      vocalmic: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="9" rx="3"/><path d="M6.5 8.5v1a5.5 5.5 0 0 0 11 0v-1"/><line x1="12" y1="14.5" x2="12" y2="18"/><line x1="12" y1="18" x2="9" y2="22"/><line x1="12" y1="18" x2="15" y2="22"/></svg>`,
+      instmic: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="9.3" y="3.3" width="5" height="8.5" rx="2.5" transform="rotate(35 12 8)"/><line x1="9" y1="12.5" x2="4" y2="17.5"/><line x1="1.5" y1="20" x2="6.5" y2="15"/></svg>`,
+      di: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="8" width="16" height="10" rx="1.5"/><circle cx="8.5" cy="13" r="1.3"/><circle cx="15.5" cy="13" r="1.3"/><line x1="5" y1="8" x2="9" y2="4"/><line x1="19" y1="8" x2="15" y2="4"/></svg>`,
+      wedge: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17 3 8 21 4 21 17Z"/><circle cx="9" cy="12.3" r="2.3"/><circle cx="16.3" cy="9.3" r="1.3"/></svg>`,
+      ampcab: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="1.5"/><circle cx="8" cy="12" r="3.3"/><circle cx="16" cy="8" r="1.3"/><circle cx="16" cy="12.5" r="1.3"/></svg>`,
+      riser: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="9" width="18" height="8" rx="1"/><line x1="3" y1="17" x2="1" y2="21"/><line x1="21" y1="17" x2="23" y2="21"/><line x1="7" y1="9" x2="7" y2="5"/><line x1="17" y1="9" x2="17" y2="5"/></svg>`,
+      keys: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="8" width="20" height="8" rx="1"/><line x1="6" y1="8" x2="6" y2="14"/><line x1="10" y1="8" x2="10" y2="14"/><line x1="14" y1="8" x2="14" y2="14"/><line x1="18" y1="8" x2="18" y2="14"/><line x1="4" y1="16" x2="4" y2="20"/><line x1="20" y1="16" x2="20" y2="20"/></svg>`,
+      power: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="6" x2="12" y2="12"/><path d="M8 8.5a6 6 0 1 0 8 0"/></svg>`,
+      performer: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5.5" r="2.8"/><path d="M6 21v-5a6 6 0 0 1 12 0v5"/></svg>`,
+      sidefill: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20" rx="1.5"/><circle cx="12" cy="8" r="2.6"/><circle cx="12" cy="16" r="1.6"/></svg>`
+    };
+
+    const STAGE_GEAR = [
+      { type: 'vocalmic', label: 'Vocal Mic' },
+      { type: 'instmic', label: 'Inst. Mic' },
+      { type: 'di', label: 'DI Box' },
+      { type: 'wedge', label: 'Monitor Wedge' },
+      { type: 'sidefill', label: 'Side Fill' },
+      { type: 'ampcab', label: 'Amp / Cab' },
+      { type: 'riser', label: 'Drum Riser' },
+      { type: 'keys', label: 'Keyboard' },
+      { type: 'power', label: 'Power Drop' },
+      { type: 'performer', label: 'Performer' }
+    ];
+
+    const STAGE_PX_PER_FT = 26; // on-screen scale — deliberately separate from export scale below
+
+    const StagePlot = (() => {
+      let overlay, surfaceEl, listEl;
+      let stageState = { widthFt: 24, depthFt: 16, grid: true, snap: true, items: [] };
+      let idCounter = 1;
+      let dragItem = null, dragStart = null;
+      let overlayEventsBound = false;
+
+      function ensure() {
+        if (overlay) return;
+        overlay = document.createElement('div');
+        overlay.className = 'stage-overlay';
+        overlay.innerHTML = `
+          <div class="stage-modal" role="dialog" aria-modal="true">
+            <div class="stage-topbar">
+              <h2>Stage Plot</h2>
+              <div class="tb-group">
+                <span class="stage-dim-label">Width</span>
+                <input type="number" min="4" max="120" class="stage-dim-input" id="stageWidthInput" value="${stageState.widthFt}">
+                <span class="stage-dim-label">ft</span>
+              </div>
+              <div class="tb-group">
+                <span class="stage-dim-label">Depth</span>
+                <input type="number" min="4" max="120" class="stage-dim-input" id="stageDepthInput" value="${stageState.depthFt}">
+                <span class="stage-dim-label">ft</span>
+              </div>
+              <label class="stage-toggle"><input type="checkbox" id="stageGridToggle" checked> Grid</label>
+              <label class="stage-toggle"><input type="checkbox" id="stageSnapToggle" checked> Snap</label>
+              <button class="tb-btn" id="stageExportBtn">Export PNG</button>
+              <button class="stage-close" id="stageCloseBtn" aria-label="Close">×</button>
+            </div>
+            <div class="stage-body">
+              <div class="stage-sidebar">
+                <input class="search-input" id="stageSearch" placeholder="Search…" spellcheck="false">
+                <div id="stagePaletteRoot"></div>
+                <div class="hint">
+                  Drag an item onto the stage, or click to drop it centered. Drag an item's icon to reposition it. Hover an item for a rotate (↻) or delete (×) button. Click a label to rename it — handy for "Kick", "Gtr Amp 1", etc.
+                </div>
+              </div>
+              <div class="stage-canvas-col">
+                <div class="stage-canvas-wrap" id="stageCanvasWrap">
+                  <div class="stage-surface-outer">
+                    <div class="stage-surface" id="stageSurface">
+                      <div class="stage-foh">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v13"/><path d="M6 12l6 6 6-6"/></svg>
+                        <span>Front of House / Audience</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="stage-list-panel">
+                <div class="stage-list-title">Input List</div>
+                <div id="stageListRoot"></div>
+              </div>
+            </div>
+          </div>`;
+        document.body.appendChild(overlay);
+        surfaceEl = overlay.querySelector('#stageSurface');
+        listEl = overlay.querySelector('#stageListRoot');
+
+        overlay.querySelector('#stageCloseBtn').addEventListener('click', close);
+        overlay.addEventListener('mousedown', (e) => { if (e.target === overlay) close(); });
+
+        overlay.querySelector('#stageWidthInput').addEventListener('change', (e) => {
+          stageState.widthFt = Math.max(4, Math.min(120, parseInt(e.target.value, 10) || stageState.widthFt));
+          renderSurface();
+        });
+        overlay.querySelector('#stageDepthInput').addEventListener('change', (e) => {
+          stageState.depthFt = Math.max(4, Math.min(120, parseInt(e.target.value, 10) || stageState.depthFt));
+          renderSurface();
+        });
+        overlay.querySelector('#stageGridToggle').addEventListener('change', (e) => {
+          stageState.grid = e.target.checked;
+          renderSurface();
+        });
+        overlay.querySelector('#stageSnapToggle').addEventListener('change', (e) => {
+          stageState.snap = e.target.checked;
+        });
+        overlay.querySelector('#stageExportBtn').addEventListener('click', exportPNG);
+
+        buildPalette();
+        overlay.querySelector('#stageSearch').addEventListener('input', (e) => {
+          const q = e.target.value.trim().toLowerCase();
+          overlay.querySelectorAll('.stage-palette-item').forEach(btn => {
+            btn.style.display = (!q || btn.dataset.search.includes(q)) ? '' : 'none';
+          });
+        });
+
+        // Drop from the palette onto the stage
+        overlay.querySelector('#stageCanvasWrap').addEventListener('dragover', (e) => {
+          if (!e.dataTransfer.types.includes('text/plain')) return;
+          e.preventDefault();
+          e.dataTransfer.dropEffect = 'copy';
+        });
+        overlay.querySelector('#stageCanvasWrap').addEventListener('drop', (e) => {
+          const idxStr = e.dataTransfer.getData('text/plain');
+          if (idxStr === '') return;
+          e.preventDefault();
+          const g = STAGE_GEAR[parseInt(idxStr, 10)];
+          if (!g) return;
+          const rect = surfaceEl.getBoundingClientRect();
+          let xFt = (e.clientX - rect.left) / STAGE_PX_PER_FT;
+          let yFt = (e.clientY - rect.top) / STAGE_PX_PER_FT;
+          addItem(g, xFt, yFt);
+        });
+      }
+
+      function buildPalette() {
+        const root = overlay.querySelector('#stagePaletteRoot');
+        root.innerHTML = STAGE_GEAR.map((g, idx) => `
+          <button class="stage-palette-item" draggable="true" data-idx="${idx}" data-search="${esc(g.label.toLowerCase())}">
+            ${STAGE_ICONS[g.type]}<span>${esc(g.label)}</span>
+          </button>`).join('');
+
+        root.addEventListener('click', (e) => {
+          const btn = e.target.closest('.stage-palette-item');
+          if (!btn) return;
+          const g = STAGE_GEAR[parseInt(btn.dataset.idx, 10)];
+          if (g) addItem(g, stageState.widthFt / 2, stageState.depthFt / 2);
+        });
+        root.addEventListener('dragstart', (e) => {
+          const btn = e.target.closest('.stage-palette-item');
+          if (!btn) return;
+          e.dataTransfer.setData('text/plain', btn.dataset.idx);
+          e.dataTransfer.effectAllowed = 'copy';
+        });
+      }
+
+      function snapFt(v) { return stageState.snap ? Math.round(v * 2) / 2 : Math.round(v * 10) / 10; }
+
+      function addItem(g, xFt, yFt) {
+        stageState.items.push({
+          id: 'st' + (idCounter++), type: g.type, label: g.label,
+          xFt: Math.max(0, Math.min(stageState.widthFt, snapFt(xFt))),
+          yFt: Math.max(0, Math.min(stageState.depthFt, snapFt(yFt))),
+          rot: 0
+        });
+        renderSurface();
+      }
+
+      function renderSurface() {
+        const w = stageState.widthFt * STAGE_PX_PER_FT;
+        const h = stageState.depthFt * STAGE_PX_PER_FT;
+        surfaceEl.style.width = w + 'px';
+        surfaceEl.style.height = h + 'px';
+        surfaceEl.style.backgroundSize = stageState.grid ? `${STAGE_PX_PER_FT}px ${STAGE_PX_PER_FT}px` : '0 0';
+
+        surfaceEl.querySelectorAll('.stage-item').forEach(el => el.remove());
+        stageState.items.forEach((it, i) => {
+          const el = document.createElement('div');
+          el.className = 'stage-item';
+          el.dataset.id = it.id;
+          el.style.left = (it.xFt * STAGE_PX_PER_FT - 29) + 'px';
+          el.style.top = (it.yFt * STAGE_PX_PER_FT - 21) + 'px';
+          el.innerHTML = `
+            <div class="stage-item-icon" style="transform:rotate(${it.rot}deg)">
+              <span class="stage-item-badge">${i + 1}</span>
+              ${STAGE_ICONS[it.type] || STAGE_ICONS.performer}
+              <button class="stage-item-del" data-stage-del="${it.id}" title="Remove">×</button>
+              <button class="stage-item-rotate" data-stage-rot="${it.id}" title="Rotate">↻</button>
+            </div>
+            <input class="stage-item-label" data-stage-label="${it.id}" value="${esc(it.label)}" spellcheck="false">`;
+          surfaceEl.appendChild(el);
+        });
+
+        renderList();
+      }
+
+      function renderList() {
+        if (!stageState.items.length) {
+          listEl.innerHTML = '<div class="stage-list-empty">Nothing on stage yet — drag items in from the left.</div>';
+          return;
+        }
+        listEl.innerHTML = stageState.items.map((it, i) => `
+          <div class="stage-list-row"><span class="stage-list-num">${i + 1}</span>${esc(it.label || 'Untitled')}</div>`).join('');
+      }
+
+      // Item interactions: drag to move, click ↻ to rotate 45°, click × to delete, click label to rename
+      function bindItemEvents() {
+        surfaceEl.addEventListener('mousedown', (e) => {
+          const delBtn = e.target.closest('[data-stage-del]');
+          if (delBtn) {
+            stageState.items = stageState.items.filter(it => it.id !== delBtn.dataset.stageDel);
+            renderSurface();
+            return;
+          }
+          const rotBtn = e.target.closest('[data-stage-rot]');
+          if (rotBtn) {
+            const it = stageState.items.find(it => it.id === rotBtn.dataset.stageRot);
+            if (it) { it.rot = (it.rot + 45) % 360; renderSurface(); }
+            return;
+          }
+          if (e.target.closest('[data-stage-label]')) return; // let the label input take the click
+          const tile = e.target.closest('.stage-item');
+          if (!tile) return;
+          const it = stageState.items.find(it => it.id === tile.dataset.id);
+          if (!it) return;
+          dragItem = it;
+          dragStart = { clientX: e.clientX, clientY: e.clientY, xFt: it.xFt, yFt: it.yFt };
+          e.preventDefault();
+        });
+
+        document.addEventListener('mousemove', (e) => {
+          if (!dragItem) return;
+          const dxFt = (e.clientX - dragStart.clientX) / STAGE_PX_PER_FT;
+          const dyFt = (e.clientY - dragStart.clientY) / STAGE_PX_PER_FT;
+          let xFt = Math.max(0, Math.min(stageState.widthFt, dragStart.xFt + dxFt));
+          let yFt = Math.max(0, Math.min(stageState.depthFt, dragStart.yFt + dyFt));
+          if (stageState.snap) { xFt = snapFt(xFt); yFt = snapFt(yFt); }
+          dragItem.xFt = xFt; dragItem.yFt = yFt;
+          const tile = surfaceEl.querySelector(`.stage-item[data-id="${dragItem.id}"]`);
+          if (tile) {
+            tile.style.left = (xFt * STAGE_PX_PER_FT - 29) + 'px';
+            tile.style.top = (yFt * STAGE_PX_PER_FT - 21) + 'px';
+          }
+        });
+
+        document.addEventListener('mouseup', () => { dragItem = null; dragStart = null; });
+
+        surfaceEl.addEventListener('input', (e) => {
+          if (!e.target.dataset.stageLabel) return;
+          const it = stageState.items.find(it => it.id === e.target.dataset.stageLabel);
+          if (it) { it.label = e.target.value; renderList(); }
+        });
+      }
+
+      function open() {
+        ensure();
+        if (!overlayEventsBound) { bindItemEvents(); overlayEventsBound = true; }
+        overlay.classList.add('open');
+        renderSurface();
+      }
+      function close() { overlay.classList.remove('open'); }
+
+      // Builds a fully self-contained SVG (literal hex colors, no external CSS)
+      // and rasterizes it to a PNG for download — works without any external library.
+      async function exportPNG() {
+        const EXPORT_PX_PER_FT = 30;
+        const pad = 50;
+        const w = stageState.widthFt * EXPORT_PX_PER_FT;
+        const h = stageState.depthFt * EXPORT_PX_PER_FT;
+        const totalW = w + pad * 2;
+        const totalH = h + pad * 2 + 60;
+
+        let itemsSvg = '';
+        stageState.items.forEach((it, i) => {
+          const cx = pad + it.xFt * EXPORT_PX_PER_FT;
+          const cy = pad + it.yFt * EXPORT_PX_PER_FT;
+          const iconInner = (STAGE_ICONS[it.type] || STAGE_ICONS.performer)
+            .replace(/^<svg[^>]*>/, '').replace(/<\/svg>$/, '');
+          itemsSvg += `
+            <g transform="translate(${cx - 12},${cy - 12}) rotate(${it.rot} 12 12)">
+              <circle cx="12" cy="12" r="17" fill="#2b2721" stroke="#c96b8a" stroke-width="2" transform="translate(0,0)"/>
+            </g>
+            <g transform="translate(${cx - 9},${cy - 9})" stroke="#c96b8a" fill="none" stroke-width="1.5">${iconInner}</g>
+            <circle cx="${cx - 17}" cy="${cy - 17}" r="8" fill="#c96b8a"/>
+            <text x="${cx - 17}" y="${cy - 14}" text-anchor="middle" font-size="9" font-family="monospace" font-weight="700" fill="#241a08">${i + 1}</text>
+            <text x="${cx}" y="${cy + 30}" text-anchor="middle" font-size="11" font-family="monospace" fill="#ece7dd">${esc(it.label || '')}</text>`;
+        });
+
+        const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${totalW}" height="${totalH}" viewBox="0 0 ${totalW} ${totalH}">
+          <rect width="${totalW}" height="${totalH}" fill="#141210"/>
+          <rect x="${pad}" y="${pad}" width="${w}" height="${h}" fill="#1c1a17" stroke="#6d685d" stroke-width="2" stroke-dasharray="6 4" rx="4"/>
+          ${itemsSvg}
+          <g transform="translate(${pad + w / 2},${pad + h + 26})">
+            <path d="M0 -14 L0 4 M-7 -3 L0 4 L7 -3" stroke="#6d685d" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <text x="0" y="22" text-anchor="middle" font-size="10" font-family="monospace" letter-spacing="1" fill="#6d685d">FRONT OF HOUSE / AUDIENCE</text>
+          </g>
+        </svg>`;
+
+        const svgBlob = new Blob([svg], { type: 'image/svg+xml;charset=utf-8' });
+        const url = URL.createObjectURL(svgBlob);
+        const img = new Image();
+        img.onload = () => {
+          const canvasEl = document.createElement('canvas');
+          canvasEl.width = totalW; canvasEl.height = totalH;
+          const ctx = canvasEl.getContext('2d');
+          ctx.drawImage(img, 0, 0);
+          URL.revokeObjectURL(url);
+          canvasEl.toBlob((blob) => {
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = (document.getElementById('setupName').value.trim() || 'stage-plot') + '-stage-plot.png';
+            a.click();
+          }, 'image/png');
+        };
+        img.onerror = () => { setStatus('Stage plot export failed.'); URL.revokeObjectURL(url); };
+        img.src = url;
+      }
+
+      return { open, close };
+    })();
+
+    document.getElementById('btn-stageplot').addEventListener('click', async () => {
+      const { data: { user } } = await supabaseClient.auth.getUser();
+      if (!user) {
+        await Dialog.alert('Sign in to use Stage Plot.', { kicker: 'ACCOUNT', title: 'Sign-in required' });
+        return;
+      }
+      const isPaid = await checkPremiumStatus(user);
+      if (!isPaid) {
+        await Dialog.alert('Stage Plot is a premium feature. Taking you to checkout…', { kicker: 'UPGRADE', title: 'Premium required', okText: 'Continue', accent: 'accessory' });
+        window.location.href = "https://buy.stripe.com/cNi28sbl2bUY2hSemE3Nm00";
+        return;
+      }
+      StagePlot.open();
     });
 
   </script>
