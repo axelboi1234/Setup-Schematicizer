@@ -1218,9 +1218,9 @@
     }
 
     .stage-modal {
-      width: 94vw;
-      height: 90vh;
-      max-width: 1400px;
+      width: 92vw;
+      height: 88vh;
+      max-width: 1200px;
       background: linear-gradient(180deg, var(--panel2) 0%, var(--panel3) 100%);
       border: 1px solid var(--border);
       border-radius: 8px;
@@ -1239,7 +1239,7 @@
     .stage-topbar {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 14px;
       flex-wrap: wrap;
       padding: 12px 16px;
       border-bottom: 1px solid var(--border);
@@ -1254,7 +1254,7 @@
       letter-spacing: .03em;
       text-transform: uppercase;
       color: var(--text-dim);
-      margin: 0 6px 0 0;
+      margin: 0;
     }
 
     .stage-topbar .tb-group {
@@ -1264,13 +1264,13 @@
     }
 
     .stage-dim-input {
-      width: 48px;
+      width: 44px;
       background: var(--panel2);
       border: 1px solid var(--border);
       color: var(--text);
       font-family: 'JetBrains Mono', monospace;
       font-size: 12px;
-      padding: 6px 7px;
+      padding: 6px 5px;
       border-radius: 4px;
       text-align: center;
     }
@@ -1279,29 +1279,70 @@
       outline: 1px solid var(--monitor);
     }
 
-    .stage-dim-label {
+    .stage-dim-label,
+    .stage-dim-x {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 10.5px;
+      font-size: 11px;
       color: var(--text-faint);
     }
 
     .stage-toggle {
       display: flex;
       align-items: center;
-      gap: 5px;
+      gap: 7px;
       font-family: 'JetBrains Mono', monospace;
       font-size: 11.5px;
+      font-weight: 500;
       color: var(--text-dim);
       cursor: pointer;
       user-select: none;
       background: var(--panel2);
       border: 1px solid var(--border);
-      padding: 6px 10px;
+      padding: 6px 10px 6px 8px;
       border-radius: 5px;
+      transition: background .12s ease, border-color .12s ease, color .12s ease;
     }
 
-    .stage-toggle input {
-      accent-color: var(--monitor);
+    .stage-toggle:hover {
+      border-color: var(--text-faint);
+    }
+
+    /* Clear on/off indicator: empty outlined square when off, filled square
+       with a checkmark when on — square to match the rest of the module UI. */
+    .stage-toggle-box {
+      width: 14px;
+      height: 14px;
+      border-radius: 3px;
+      border: 1.5px solid var(--text-faint);
+      background: transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex: none;
+      transition: background .12s ease, border-color .12s ease;
+    }
+
+    .stage-toggle-box svg {
+      width: 9px;
+      height: 9px;
+      display: block;
+      opacity: 0;
+      transition: opacity .12s ease;
+    }
+
+    .stage-toggle[data-active="true"] {
+      background: var(--monitor);
+      border-color: var(--monitor);
+      color: #241a08;
+    }
+
+    .stage-toggle[data-active="true"] .stage-toggle-box {
+      background: #241a08;
+      border-color: #241a08;
+    }
+
+    .stage-toggle[data-active="true"] .stage-toggle-box svg {
+      opacity: 1;
     }
 
     .stage-close {
@@ -1329,8 +1370,9 @@
       min-height: 0;
     }
 
+    /* Sidebar — a compact icon grid rather than a long list of text rows */
     .stage-sidebar {
-      width: 190px;
+      width: 176px;
       flex: none;
       background: var(--panel);
       border-right: 1px solid var(--border);
@@ -1342,22 +1384,24 @@
       margin-bottom: 10px;
     }
 
+    .stage-palette-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
     .stage-palette-item {
       display: flex;
+      flex-direction: column;
       align-items: center;
-      gap: 8px;
-      width: 100%;
+      gap: 6px;
       background: var(--panel2);
       border: 1px solid var(--border);
-      border-left: 3px solid var(--monitor);
-      color: var(--text);
-      font-size: 12px;
-      font-weight: 500;
-      padding: 7px 8px;
-      border-radius: 4px;
+      border-top: 3px solid var(--monitor);
+      border-radius: 6px;
+      padding: 8px 4px 10px;
       cursor: grab;
-      margin: 0 0 6px;
-      text-align: left;
+      text-align: center;
     }
 
     .stage-palette-item:active {
@@ -1366,21 +1410,28 @@
 
     .stage-palette-item:hover {
       background: #332e26;
-      border-left-width: 5px;
+      border-color: var(--monitor);
     }
 
     .stage-palette-item svg {
-      width: 16px;
-      height: 16px;
+      width: 20px;
+      height: 20px;
       flex: none;
       color: var(--monitor);
+    }
+
+    .stage-palette-item span {
+      font-size: 10px;
+      font-weight: 500;
+      color: var(--text-dim);
+      line-height: 1.25;
     }
 
     .stage-sidebar .hint {
       font-size: 11px;
       line-height: 1.55;
       color: var(--text-faint);
-      margin-top: 10px;
+      margin-top: 12px;
       padding-top: 12px;
       border-top: 1px solid var(--border-soft);
     }
@@ -1403,23 +1454,23 @@
 
     .stage-surface-outer {
       display: inline-block;
-      margin: 44px auto 70px;
+      margin: 48px auto 74px;
       position: relative;
     }
 
     .stage-surface {
       position: relative;
       background-color: #1c1a17;
-      background-image: linear-gradient(#332e26 1px, transparent 1px), linear-gradient(90deg, #332e26 1px, transparent 1px);
+      background-image: linear-gradient(#2c2820 1px, transparent 1px), linear-gradient(90deg, #2c2820 1px, transparent 1px);
       background-size: 0 0;
-      border: 2px dashed var(--text-faint);
-      border-radius: 4px;
+      border: 1px solid var(--border-soft);
+      border-radius: 3px;
     }
 
     .stage-foh {
       position: absolute;
       left: 50%;
-      bottom: -40px;
+      bottom: -42px;
       transform: translateX(-50%);
       display: flex;
       flex-direction: column;
@@ -1431,8 +1482,8 @@
 
     .stage-foh svg {
       color: var(--text-faint);
-      width: 20px;
-      height: 20px;
+      width: 18px;
+      height: 18px;
     }
 
     .stage-foh span {
@@ -1460,41 +1511,45 @@
       z-index: 3;
     }
 
+    /* Outer square stays fixed — only its inner contents rotate — so the
+       delete/rotate buttons never spin out of reach or upside-down.
+       Styled like the signal-chain node modules: rounded-square panel
+       with a colored accent strip, not a circular badge. */
     .stage-item-icon {
       width: 42px;
       height: 42px;
-      border-radius: 50%;
-      background: var(--panel2);
-      border: 2px solid var(--monitor);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--monitor);
+      border-radius: 7px;
+      background: linear-gradient(180deg, var(--panel2) 0%, var(--panel3) 100%);
+      border: 1px solid var(--border);
       position: relative;
       box-shadow: 0 3px 8px rgba(0, 0, 0, .4);
       flex: none;
     }
 
-    .stage-item-icon svg {
-      width: 22px;
-      height: 22px;
+    .stage-item-icon::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: var(--monitor);
+      border-radius: 6px 6px 0 0;
     }
 
-    .stage-item-badge {
-      position: absolute;
-      top: -6px;
-      left: -6px;
-      width: 16px;
-      height: 16px;
-      border-radius: 50%;
-      background: var(--monitor);
-      color: #241a08;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 9px;
-      font-weight: 700;
+    .stage-item-icon-inner {
+      width: 100%;
+      height: 100%;
       display: flex;
       align-items: center;
       justify-content: center;
+      color: var(--monitor);
+      transition: transform .12s ease;
+    }
+
+    .stage-item-icon-inner svg {
+      width: 22px;
+      height: 22px;
     }
 
     .stage-item-del {
@@ -1557,55 +1612,6 @@
       outline: none;
       border-bottom: 1px solid var(--text-faint);
     }
-
-    .stage-list-panel {
-      width: 220px;
-      flex: none;
-      background: var(--panel);
-      border-left: 1px solid var(--border);
-      padding: 12px;
-      overflow-y: auto;
-    }
-
-    .stage-list-title {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 10px;
-      text-transform: uppercase;
-      letter-spacing: .06em;
-      color: var(--text-faint);
-      margin-bottom: 8px;
-    }
-
-    .stage-list-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 6px 0;
-      border-bottom: 1px solid var(--border-soft);
-      font-size: 12px;
-      color: var(--text-dim);
-    }
-
-    .stage-list-num {
-      width: 18px;
-      height: 18px;
-      border-radius: 50%;
-      background: var(--monitor);
-      color: #241a08;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 9.5px;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex: none;
-    }
-
-    .stage-list-empty {
-      color: var(--text-faint);
-      font-size: 12px;
-      padding: 8px 2px;
-    }
   </style>
 </head>
 
@@ -1664,7 +1670,7 @@
               <path d="M6 20l1-9a5 5 0 0 1 10 0l1 9" />
               <circle cx="12" cy="7" r="2" />
             </svg>
-            Stage Plot ✨
+            Stage Plot
           </button>
         </div>
 
@@ -3188,38 +3194,39 @@
     // where people/mics/monitors/amps stand — as opposed to the signal-flow
     // canvas behind it. Deliberately kept independent of `state`/`nodes` so
     // it works whether or not a signal chain has been built yet.
+    // All units are metric (meters).
 
     const STAGE_ICONS = {
-      vocalmic: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="9" rx="3"/><path d="M6.5 8.5v1a5.5 5.5 0 0 0 11 0v-1"/><line x1="12" y1="14.5" x2="12" y2="18"/><line x1="12" y1="18" x2="9" y2="22"/><line x1="12" y1="18" x2="15" y2="22"/></svg>`,
-      instmic: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="9.3" y="3.3" width="5" height="8.5" rx="2.5" transform="rotate(35 12 8)"/><line x1="9" y1="12.5" x2="4" y2="17.5"/><line x1="1.5" y1="20" x2="6.5" y2="15"/></svg>`,
-      di: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="8" width="16" height="10" rx="1.5"/><circle cx="8.5" cy="13" r="1.3"/><circle cx="15.5" cy="13" r="1.3"/><line x1="5" y1="8" x2="9" y2="4"/><line x1="19" y1="8" x2="15" y2="4"/></svg>`,
-      wedge: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17 3 8 21 4 21 17Z"/><circle cx="9" cy="12.3" r="2.3"/><circle cx="16.3" cy="9.3" r="1.3"/></svg>`,
-      ampcab: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="1.5"/><circle cx="8" cy="12" r="3.3"/><circle cx="16" cy="8" r="1.3"/><circle cx="16" cy="12.5" r="1.3"/></svg>`,
-      riser: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="9" width="18" height="8" rx="1"/><line x1="3" y1="17" x2="1" y2="21"/><line x1="21" y1="17" x2="23" y2="21"/><line x1="7" y1="9" x2="7" y2="5"/><line x1="17" y1="9" x2="17" y2="5"/></svg>`,
-      keys: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="8" width="20" height="8" rx="1"/><line x1="6" y1="8" x2="6" y2="14"/><line x1="10" y1="8" x2="10" y2="14"/><line x1="14" y1="8" x2="14" y2="14"/><line x1="18" y1="8" x2="18" y2="14"/><line x1="4" y1="16" x2="4" y2="20"/><line x1="20" y1="16" x2="20" y2="20"/></svg>`,
-      power: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="6" x2="12" y2="12"/><path d="M8 8.5a6 6 0 1 0 8 0"/></svg>`,
-      performer: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5.5" r="2.8"/><path d="M6 21v-5a6 6 0 0 1 12 0v5"/></svg>`,
-      sidefill: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20" rx="1.5"/><circle cx="12" cy="8" r="2.6"/><circle cx="12" cy="16" r="1.6"/></svg>`
+      vocalmic: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="9.5" y="2.5" width="5" height="8" rx="2.5"/><path d="M7 9.5a5 5 0 0 0 10 0"/><line x1="12" y1="14.5" x2="12" y2="18"/><line x1="8.5" y1="21" x2="15.5" y2="21"/></svg>`,
+      instmic: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="10.3" y="3" width="4.6" height="8" rx="2.3" transform="rotate(35 12.6 7)"/><line x1="9" y1="12" x2="4" y2="18"/><circle cx="4" cy="19.5" r="1" fill="currentColor" stroke="none"/></svg>`,
+      di: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="9" rx="1.5"/><line x1="6" y1="12.5" x2="18" y2="12.5"/><circle cx="8.5" cy="12.5" r="1"/><circle cx="15.5" cy="12.5" r="1"/></svg>`,
+      wedge: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17V9l18-5v13z"/><circle cx="11" cy="12" r="3"/></svg>`,
+      sidefill: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2" width="10" height="20" rx="1.5"/><circle cx="12" cy="8" r="2.6"/><circle cx="12" cy="16" r="1.8"/></svg>`,
+      ampcab: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="1.5"/><circle cx="8.5" cy="12" r="3.4"/><circle cx="16" cy="12" r="3.4"/></svg>`,
+      riser: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="7" rx="1"/><line x1="5" y1="15" x2="3" y2="20"/><line x1="19" y1="15" x2="21" y2="20"/></svg>`,
+      keys: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="10" rx="2"/><line x1="6" y1="7" x2="6" y2="17"/><rect x="8.5" y="9" width="4" height="2.5" rx="0.5"/><circle cx="17.5" cy="10.5" r="1"/><line x1="10" y1="14" x2="10" y2="17"/><line x1="14" y1="14" x2="14" y2="17"/><line x1="18" y1="14" x2="18" y2="17"/></svg>`,
+      power: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><line x1="12" y1="6" x2="12" y2="12"/></svg>`,
+      performer: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="6" r="3"/><path d="M6 21v-4a6 6 0 0 1 12 0v4"/></svg>`
     };
 
     const STAGE_GEAR = [
       { type: 'vocalmic', label: 'Vocal Mic' },
-      { type: 'instmic', label: 'Inst. Mic' },
+      { type: 'instmic', label: 'Instrument Mic' },
       { type: 'di', label: 'DI Box' },
-      { type: 'wedge', label: 'Monitor Wedge' },
+      { type: 'wedge', label: 'Monitor' },
       { type: 'sidefill', label: 'Side Fill' },
-      { type: 'ampcab', label: 'Amp / Cab' },
+      { type: 'ampcab', label: 'Amp Cab' },
       { type: 'riser', label: 'Drum Riser' },
       { type: 'keys', label: 'Keyboard' },
-      { type: 'power', label: 'Power Drop' },
+      { type: 'power', label: 'Power' },
       { type: 'performer', label: 'Performer' }
     ];
 
-    const STAGE_PX_PER_FT = 26; // on-screen scale — deliberately separate from export scale below
+    const STAGE_PX_PER_M = 70; // on-screen scale — deliberately separate from export scale below
 
     const StagePlot = (() => {
-      let overlay, surfaceEl, listEl;
-      let stageState = { widthFt: 24, depthFt: 16, grid: true, snap: true, items: [] };
+      let overlay, surfaceEl;
+      let stageState = { widthM: 8, depthM: 5, grid: true, snap: true, items: [] };
       let idCounter = 1;
       let dragItem = null, dragStart = null;
       let overlayEventsBound = false;
@@ -3231,28 +3238,31 @@
         overlay.innerHTML = `
           <div class="stage-modal" role="dialog" aria-modal="true">
             <div class="stage-topbar">
-              <h2>Stage Plot</h2>
+              <h2>Stage Plotter</h2>
+              <div class="tb-divider"></div>
               <div class="tb-group">
-                <span class="stage-dim-label">Width</span>
-                <input type="number" min="4" max="120" class="stage-dim-input" id="stageWidthInput" value="${stageState.widthFt}">
-                <span class="stage-dim-label">ft</span>
+                <span class="stage-dim-label">Stage</span>
+                <input type="number" min="2" max="40" class="stage-dim-input" id="stageWidthInput" value="${stageState.widthM}">
+                <span class="stage-dim-x">×</span>
+                <input type="number" min="2" max="40" class="stage-dim-input" id="stageDepthInput" value="${stageState.depthM}">
+                <span class="stage-dim-label">m</span>
               </div>
-              <div class="tb-group">
-                <span class="stage-dim-label">Depth</span>
-                <input type="number" min="4" max="120" class="stage-dim-input" id="stageDepthInput" value="${stageState.depthFt}">
-                <span class="stage-dim-label">ft</span>
-              </div>
-              <label class="stage-toggle"><input type="checkbox" id="stageGridToggle" checked> Grid</label>
-              <label class="stage-toggle"><input type="checkbox" id="stageSnapToggle" checked> Snap</label>
+              <div class="tb-divider"></div>
+              <button type="button" class="stage-toggle" id="stageGridToggle" data-active="true" aria-pressed="true"><span class="stage-toggle-box"><svg viewBox="0 0 24 24" fill="none" stroke="var(--monitor)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 12 9 17 20 6"/></svg></span>Grid</button>
+              <button type="button" class="stage-toggle" id="stageSnapToggle" data-active="true" aria-pressed="true"><span class="stage-toggle-box"><svg viewBox="0 0 24 24" fill="none" stroke="var(--monitor)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 12 9 17 20 6"/></svg></span>Snap</button>
+              <div class="spacer"></div>
               <button class="tb-btn" id="stageExportBtn">Export PNG</button>
               <button class="stage-close" id="stageCloseBtn" aria-label="Close">×</button>
             </div>
             <div class="stage-body">
               <div class="stage-sidebar">
                 <input class="search-input" id="stageSearch" placeholder="Search…" spellcheck="false">
-                <div id="stagePaletteRoot"></div>
+                <div class="stage-palette-grid" id="stagePaletteRoot"></div>
                 <div class="hint">
-                  Drag an item onto the stage, or click to drop it centered. Drag an item's icon to reposition it. Hover an item for a rotate (↻) or delete (×) button. Click a label to rename it — handy for "Kick", "Gtr Amp 1", etc.
+                  - Drag an item onto the stage, or click to drop it centered. <br>
+                  - Drag an item to reposition it. <br>
+                  - Hover over item for rotate (↻) / delete (×). <br>
+                  - Click a label to rename it. <br>
                 </div>
               </div>
               <div class="stage-canvas-col">
@@ -3267,33 +3277,34 @@
                   </div>
                 </div>
               </div>
-              <div class="stage-list-panel">
-                <div class="stage-list-title">Input List</div>
-                <div id="stageListRoot"></div>
-              </div>
             </div>
           </div>`;
         document.body.appendChild(overlay);
         surfaceEl = overlay.querySelector('#stageSurface');
-        listEl = overlay.querySelector('#stageListRoot');
 
         overlay.querySelector('#stageCloseBtn').addEventListener('click', close);
         overlay.addEventListener('mousedown', (e) => { if (e.target === overlay) close(); });
 
         overlay.querySelector('#stageWidthInput').addEventListener('change', (e) => {
-          stageState.widthFt = Math.max(4, Math.min(120, parseInt(e.target.value, 10) || stageState.widthFt));
+          stageState.widthM = Math.max(2, Math.min(40, parseFloat(e.target.value) || stageState.widthM));
           renderSurface();
         });
         overlay.querySelector('#stageDepthInput').addEventListener('change', (e) => {
-          stageState.depthFt = Math.max(4, Math.min(120, parseInt(e.target.value, 10) || stageState.depthFt));
+          stageState.depthM = Math.max(2, Math.min(40, parseFloat(e.target.value) || stageState.depthM));
           renderSurface();
         });
-        overlay.querySelector('#stageGridToggle').addEventListener('change', (e) => {
-          stageState.grid = e.target.checked;
+        const gridToggleEl = overlay.querySelector('#stageGridToggle');
+        gridToggleEl.addEventListener('click', () => {
+          stageState.grid = !stageState.grid;
+          gridToggleEl.dataset.active = String(stageState.grid);
+          gridToggleEl.setAttribute('aria-pressed', String(stageState.grid));
           renderSurface();
         });
-        overlay.querySelector('#stageSnapToggle').addEventListener('change', (e) => {
-          stageState.snap = e.target.checked;
+        const snapToggleEl = overlay.querySelector('#stageSnapToggle');
+        snapToggleEl.addEventListener('click', () => {
+          stageState.snap = !stageState.snap;
+          snapToggleEl.dataset.active = String(stageState.snap);
+          snapToggleEl.setAttribute('aria-pressed', String(stageState.snap));
         });
         overlay.querySelector('#stageExportBtn').addEventListener('click', exportPNG);
 
@@ -3318,9 +3329,9 @@
           const g = STAGE_GEAR[parseInt(idxStr, 10)];
           if (!g) return;
           const rect = surfaceEl.getBoundingClientRect();
-          let xFt = (e.clientX - rect.left) / STAGE_PX_PER_FT;
-          let yFt = (e.clientY - rect.top) / STAGE_PX_PER_FT;
-          addItem(g, xFt, yFt);
+          let xM = (e.clientX - rect.left) / STAGE_PX_PER_M;
+          let yM = (e.clientY - rect.top) / STAGE_PX_PER_M;
+          addItem(g, xM, yM);
         });
       }
 
@@ -3335,7 +3346,7 @@
           const btn = e.target.closest('.stage-palette-item');
           if (!btn) return;
           const g = STAGE_GEAR[parseInt(btn.dataset.idx, 10)];
-          if (g) addItem(g, stageState.widthFt / 2, stageState.depthFt / 2);
+          if (g) addItem(g, stageState.widthM / 2, stageState.depthM / 2);
         });
         root.addEventListener('dragstart', (e) => {
           const btn = e.target.closest('.stage-palette-item');
@@ -3345,56 +3356,46 @@
         });
       }
 
-      function snapFt(v) { return stageState.snap ? Math.round(v * 2) / 2 : Math.round(v * 10) / 10; }
+      function snapM(v) { return stageState.snap ? Math.round(v * 2) / 2 : Math.round(v * 10) / 10; }
 
-      function addItem(g, xFt, yFt) {
+      function addItem(g, xM, yM) {
         stageState.items.push({
           id: 'st' + (idCounter++), type: g.type, label: g.label,
-          xFt: Math.max(0, Math.min(stageState.widthFt, snapFt(xFt))),
-          yFt: Math.max(0, Math.min(stageState.depthFt, snapFt(yFt))),
+          xM: Math.max(0, Math.min(stageState.widthM, snapM(xM))),
+          yM: Math.max(0, Math.min(stageState.depthM, snapM(yM))),
           rot: 0
         });
         renderSurface();
       }
 
       function renderSurface() {
-        const w = stageState.widthFt * STAGE_PX_PER_FT;
-        const h = stageState.depthFt * STAGE_PX_PER_FT;
+        const w = stageState.widthM * STAGE_PX_PER_M;
+        const h = stageState.depthM * STAGE_PX_PER_M;
         surfaceEl.style.width = w + 'px';
         surfaceEl.style.height = h + 'px';
-        surfaceEl.style.backgroundSize = stageState.grid ? `${STAGE_PX_PER_FT}px ${STAGE_PX_PER_FT}px` : '0 0';
+        surfaceEl.style.backgroundSize = stageState.grid ? `${STAGE_PX_PER_M}px ${STAGE_PX_PER_M}px` : '0 0';
 
         surfaceEl.querySelectorAll('.stage-item').forEach(el => el.remove());
-        stageState.items.forEach((it, i) => {
+        stageState.items.forEach((it) => {
           const el = document.createElement('div');
           el.className = 'stage-item';
           el.dataset.id = it.id;
-          el.style.left = (it.xFt * STAGE_PX_PER_FT - 29) + 'px';
-          el.style.top = (it.yFt * STAGE_PX_PER_FT - 21) + 'px';
+          el.style.left = (it.xM * STAGE_PX_PER_M - 29) + 'px';
+          el.style.top = (it.yM * STAGE_PX_PER_M - 21) + 'px';
           el.innerHTML = `
-            <div class="stage-item-icon" style="transform:rotate(${it.rot}deg)">
-              <span class="stage-item-badge">${i + 1}</span>
-              ${STAGE_ICONS[it.type] || STAGE_ICONS.performer}
+            <div class="stage-item-icon">
+              <div class="stage-item-icon-inner" style="transform:rotate(${it.rot}deg)">${STAGE_ICONS[it.type] || STAGE_ICONS.performer}</div>
               <button class="stage-item-del" data-stage-del="${it.id}" title="Remove">×</button>
               <button class="stage-item-rotate" data-stage-rot="${it.id}" title="Rotate">↻</button>
             </div>
             <input class="stage-item-label" data-stage-label="${it.id}" value="${esc(it.label)}" spellcheck="false">`;
           surfaceEl.appendChild(el);
         });
-
-        renderList();
       }
 
-      function renderList() {
-        if (!stageState.items.length) {
-          listEl.innerHTML = '<div class="stage-list-empty">Nothing on stage yet — drag items in from the left.</div>';
-          return;
-        }
-        listEl.innerHTML = stageState.items.map((it, i) => `
-          <div class="stage-list-row"><span class="stage-list-num">${i + 1}</span>${esc(it.label || 'Untitled')}</div>`).join('');
-      }
-
-      // Item interactions: drag to move, click ↻ to rotate 45°, click × to delete, click label to rename
+      // Item interactions: drag to move, click ↻ to rotate 45°, click × to delete, click label to rename.
+      // Rotation is applied only to .stage-item-icon-inner, never to .stage-item-icon itself, so the
+      // delete/rotate buttons (children of the outer, unrotated element) always stay put in their corners.
       function bindItemEvents() {
         surfaceEl.addEventListener('mousedown', (e) => {
           const delBtn = e.target.closest('[data-stage-del]');
@@ -3406,7 +3407,11 @@
           const rotBtn = e.target.closest('[data-stage-rot]');
           if (rotBtn) {
             const it = stageState.items.find(it => it.id === rotBtn.dataset.stageRot);
-            if (it) { it.rot = (it.rot + 45) % 360; renderSurface(); }
+            if (it) {
+              it.rot = (it.rot + 45) % 360;
+              const inner = surfaceEl.querySelector(`.stage-item[data-id="${it.id}"] .stage-item-icon-inner`);
+              if (inner) inner.style.transform = `rotate(${it.rot}deg)`;
+            }
             return;
           }
           if (e.target.closest('[data-stage-label]')) return; // let the label input take the click
@@ -3415,22 +3420,22 @@
           const it = stageState.items.find(it => it.id === tile.dataset.id);
           if (!it) return;
           dragItem = it;
-          dragStart = { clientX: e.clientX, clientY: e.clientY, xFt: it.xFt, yFt: it.yFt };
+          dragStart = { clientX: e.clientX, clientY: e.clientY, xM: it.xM, yM: it.yM };
           e.preventDefault();
         });
 
         document.addEventListener('mousemove', (e) => {
           if (!dragItem) return;
-          const dxFt = (e.clientX - dragStart.clientX) / STAGE_PX_PER_FT;
-          const dyFt = (e.clientY - dragStart.clientY) / STAGE_PX_PER_FT;
-          let xFt = Math.max(0, Math.min(stageState.widthFt, dragStart.xFt + dxFt));
-          let yFt = Math.max(0, Math.min(stageState.depthFt, dragStart.yFt + dyFt));
-          if (stageState.snap) { xFt = snapFt(xFt); yFt = snapFt(yFt); }
-          dragItem.xFt = xFt; dragItem.yFt = yFt;
+          const dxM = (e.clientX - dragStart.clientX) / STAGE_PX_PER_M;
+          const dyM = (e.clientY - dragStart.clientY) / STAGE_PX_PER_M;
+          let xM = Math.max(0, Math.min(stageState.widthM, dragStart.xM + dxM));
+          let yM = Math.max(0, Math.min(stageState.depthM, dragStart.yM + dyM));
+          if (stageState.snap) { xM = snapM(xM); yM = snapM(yM); }
+          dragItem.xM = xM; dragItem.yM = yM;
           const tile = surfaceEl.querySelector(`.stage-item[data-id="${dragItem.id}"]`);
           if (tile) {
-            tile.style.left = (xFt * STAGE_PX_PER_FT - 29) + 'px';
-            tile.style.top = (yFt * STAGE_PX_PER_FT - 21) + 'px';
+            tile.style.left = (xM * STAGE_PX_PER_M - 29) + 'px';
+            tile.style.top = (yM * STAGE_PX_PER_M - 21) + 'px';
           }
         });
 
@@ -3439,7 +3444,7 @@
         surfaceEl.addEventListener('input', (e) => {
           if (!e.target.dataset.stageLabel) return;
           const it = stageState.items.find(it => it.id === e.target.dataset.stageLabel);
-          if (it) { it.label = e.target.value; renderList(); }
+          if (it) it.label = e.target.value;
         });
       }
 
@@ -3454,32 +3459,29 @@
       // Builds a fully self-contained SVG (literal hex colors, no external CSS)
       // and rasterizes it to a PNG for download — works without any external library.
       async function exportPNG() {
-        const EXPORT_PX_PER_FT = 30;
+        const EXPORT_PX_PER_M = 80;
         const pad = 50;
-        const w = stageState.widthFt * EXPORT_PX_PER_FT;
-        const h = stageState.depthFt * EXPORT_PX_PER_FT;
+        const w = stageState.widthM * EXPORT_PX_PER_M;
+        const h = stageState.depthM * EXPORT_PX_PER_M;
         const totalW = w + pad * 2;
         const totalH = h + pad * 2 + 60;
 
         let itemsSvg = '';
-        stageState.items.forEach((it, i) => {
-          const cx = pad + it.xFt * EXPORT_PX_PER_FT;
-          const cy = pad + it.yFt * EXPORT_PX_PER_FT;
+        stageState.items.forEach((it) => {
+          const cx = pad + it.xM * EXPORT_PX_PER_M;
+          const cy = pad + it.yM * EXPORT_PX_PER_M;
           const iconInner = (STAGE_ICONS[it.type] || STAGE_ICONS.performer)
             .replace(/^<svg[^>]*>/, '').replace(/<\/svg>$/, '');
           itemsSvg += `
-            <g transform="translate(${cx - 12},${cy - 12}) rotate(${it.rot} 12 12)">
-              <circle cx="12" cy="12" r="17" fill="#2b2721" stroke="#c96b8a" stroke-width="2" transform="translate(0,0)"/>
-            </g>
-            <g transform="translate(${cx - 9},${cy - 9})" stroke="#c96b8a" fill="none" stroke-width="1.5">${iconInner}</g>
-            <circle cx="${cx - 17}" cy="${cy - 17}" r="8" fill="#c96b8a"/>
-            <text x="${cx - 17}" y="${cy - 14}" text-anchor="middle" font-size="9" font-family="monospace" font-weight="700" fill="#241a08">${i + 1}</text>
+            <rect x="${cx - 15}" y="${cy - 15}" width="30" height="30" rx="6" fill="#2b2721" stroke="#3c362d" stroke-width="1.5"/>
+            <path d="M${cx - 13.5} ${cy - 13} h27 v4 a2 2 0 0 1 -2 2 h-23 a2 2 0 0 1 -2 -2 Z" fill="#c96b8a"/>
+            <g transform="translate(${cx},${cy}) rotate(${it.rot}) translate(-9,-9)" stroke="#c96b8a" fill="none" stroke-width="1.5">${iconInner}</g>
             <text x="${cx}" y="${cy + 30}" text-anchor="middle" font-size="11" font-family="monospace" fill="#ece7dd">${esc(it.label || '')}</text>`;
         });
 
         const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${totalW}" height="${totalH}" viewBox="0 0 ${totalW} ${totalH}">
           <rect width="${totalW}" height="${totalH}" fill="#141210"/>
-          <rect x="${pad}" y="${pad}" width="${w}" height="${h}" fill="#1c1a17" stroke="#6d685d" stroke-width="2" stroke-dasharray="6 4" rx="4"/>
+          <rect x="${pad}" y="${pad}" width="${w}" height="${h}" fill="#1c1a17" stroke="#6d685d" stroke-width="1.5" rx="3"/>
           ${itemsSvg}
           <g transform="translate(${pad + w / 2},${pad + h + 26})">
             <path d="M0 -14 L0 4 M-7 -3 L0 4 L7 -3" stroke="#6d685d" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
