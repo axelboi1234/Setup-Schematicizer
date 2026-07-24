@@ -2740,8 +2740,27 @@
         return true;
       }
 
+      // Not premium — reset the button back to its default state. Without this,
+      // the button stays stuck on "Premium Active" from a previous account/session
+      // even after switching to a non-premium account.
+      if (upgradeBtn) {
+        upgradeBtn.textContent = "✨ Go Premium";
+        upgradeBtn.style.opacity = "";
+        upgradeBtn.style.pointerEvents = "";
+      }
+
       console.log("User found, but premium status is false/not matching code fields.");
       return false;
+    }
+
+    // Sends the person to Stripe checkout, tagging the session with their Supabase
+    // user id via client_reference_id. The webhook (see Edge Function) reads this
+    // back off the completed session to know whose profiles.is_premium to flip on.
+    const STRIPE_PAYMENT_LINK = "https://buy.stripe.com/cNi28sbl2bUY2hSemE3Nm00";
+    function goToCheckout(user) {
+      const url = new URL(STRIPE_PAYMENT_LINK);
+      if (user && user.id) url.searchParams.set('client_reference_id', user.id);
+      window.location.href = url.toString();
     }
 
     // 5. BACKEND LISTENERS FOR STATE MANAGEMENT
@@ -2796,7 +2815,7 @@
       const isPaid = await checkPremiumStatus(user);
       if (!isPaid) {
         await Dialog.alert('Cloud save needs a premium subscription. Taking you to checkout…', { kicker: 'UPGRADE', title: 'Premium required', okText: 'Continue', accent: 'accessory' });
-        window.location.href = "https://buy.stripe.com/cNi28sbl2bUY2hSemE3Nm00";
+        goToCheckout(user);
         return false;
       }
 
@@ -2924,7 +2943,7 @@
         const isPaid = await checkPremiumStatus(user);
         if (!isPaid) {
           await Dialog.alert('Cloud load needs a premium subscription. Taking you to checkout…', { kicker: 'UPGRADE', title: 'Premium required', okText: 'Continue', accent: 'accessory' });
-          window.location.href = "https://buy.stripe.com/cNi28sbl2bUY2hSemE3Nm00";
+          goToCheckout(user);
           return;
         }
         ensure();
@@ -3185,8 +3204,9 @@
       RigManager.open();
     });
 
-    document.getElementById('btn-upgrade').addEventListener('click', () => {
-      window.location.href = "https://buy.stripe.com/cNi28sbl2bUY2hSemE3Nm00";
+    document.getElementById('btn-upgrade').addEventListener('click', async () => {
+      const { data: { user } } = await supabaseClient.auth.getUser();
+      goToCheckout(user);
     });
 
     // === Stage Plot (premium feature) ===================================
@@ -3521,7 +3541,7 @@
       const isPaid = await checkPremiumStatus(user);
       if (!isPaid) {
         await Dialog.alert('Stage Plot is a premium feature. Taking you to checkout…', { kicker: 'UPGRADE', title: 'Premium required', okText: 'Continue', accent: 'accessory' });
-        window.location.href = "https://buy.stripe.com/cNi28sbl2bUY2hSemE3Nm00";
+        goToCheckout(user);
         return;
       }
       StagePlot.open();
